@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.repository.UserMapper">
+
+	<select id="findByUserNo"
+		parameterType="String"
+		resultType="com.example.demo.domain.model.LoginUser">
+
+		SELECT
+		id,
+		user_no,
+		name,
+		email,
+		start_date,
+		password,
+		role_cd,
+		created_at,
+		updated_at
+		FROM
+		users
+		WHERE
+		user_no = #{userNo}
+
+	</select>
+
+
+	<select id="findByEmail"
+		parameterType="String"
+		resultType="com.example.demo.domain.model.LoginUser">
+
+		SELECT
+		id,
+		user_no,
+		name,
+		email,
+		start_date,
+		password,
+		role_cd,
+		created_at,
+		updated_at
+		FROM
+		users
+		WHERE
+		email = #{email}
+
+	</select>
+
+
+	<!-- 検索条件（共通） -->
+	<sql id="searchCondition">
+		<where>
+			<if test="userNo != null and userNo != ''">
+				AND user_no LIKE CONCAT('%', #{userNo}, '%')
+			</if>
+
+			<if test="name != null and name != ''">
+				AND name LIKE CONCAT('%', #{name}, '%')
+			</if>
+
+			<if test="email != null and email != ''">
+				AND email LIKE CONCAT('%', #{email}, '%')
+			</if>
+
+			<if test="startDate != null">
+				AND start_date = #{startDate}
+			</if>
+
+			<if test="roleCd != null and roleCd != ''">
+				AND role_cd = #{roleCd}
+			</if>
+		</where>
+	</sql>
+
+	<select id="findAll"
+		parameterType="com.example.demo.form.LoginUserSearchForm"
+		resultType="com.example.demo.domain.model.LoginUser"> SELECT id,
+		user_no, name, email, start_date, role_cd, created_at, updated_at FROM
+		users <include refid="searchCondition" /> ORDER BY user_no LIMIT
+		#{pageSize} OFFSET #{offset} </select>
+
+	<!-- 検索結果の総件数取得（ページング用） -->
+	<select id="countAll"
+		parameterType="com.example.demo.form.LoginUserSearchForm"
+		resultType="int"> SELECT COUNT(*) FROM users <include
+			refid="searchCondition" />
+
+	</select>
+
+
+	<!-- SQL：社員登録 -->
+	<insert id="insertOne">
+		INSERT INTO users(
+		user_no,
+		name,
+		email,
+		start_date,
+		password,
+		role_cd,
+		created_at,
+		updated_at
+		) VALUES(
+		#{userNo},
+		#{name},
+		#{email},
+		#{startDate},
+		#{password},
+		#{roleCd},
+		CURRENT_TIMESTAMP,
+		CURRENT_TIMESTAMP
+		)
+	</insert>
+
+	<!-- SQL：社員更新（パスワードは指定があった場合のみ更新） -->
+	<update id="updateOne"> UPDATE users <set> user_no = #{userNo}, name =
+		#{name}, start_date = #{startDate}, role_cd = #{roleCd}, <if
+				test="password != null and password != ''">
+				password = #{password},
+			</if> updated_at = CURRENT_TIMESTAMP </set>
+		WHERE id = #{id} </update>
+
+
+	<!-- SQL：社員削除 -->
+	<delete id="deleteOne">
+		DELETE FROM users
+		WHERE id = #{id}
+	</delete>
+
+
+</mapper>
