@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<head>
+	<title>社員マスタ管理</title>
+</head>
+
+<body>
+
+	<div layout:fragment="content">
+
+		<!-- Reactの画面を表示する場所 -->
+		<div id="root"></div>
+
+		<!-- Reactのビルドファイル -->
+		<script type="module" th:src="@{/assets/bundle.js}"></script>
+
+	</div>
+
+</body>
+
+</html>
