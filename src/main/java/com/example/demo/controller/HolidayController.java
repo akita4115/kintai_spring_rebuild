@@ -1,21 +1,26 @@
 package com.example.demo.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.demo.domain.model.Holiday;
 import com.example.demo.domain.service.HolidayService;
+import com.example.demo.form.HolidayDetailForm;
 import com.example.demo.form.HolidaySearchForm;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/holiday")
-
 public class HolidayController {
 
 	@Autowired
@@ -28,21 +33,80 @@ public class HolidayController {
 	public String getIndex(
 			@ModelAttribute HolidaySearchForm holidaySearchForm,
 			Model model) {
-		//検索条件で祝日一覧を取得
-		List<Holiday> holidayList = holidayService.getHolidayList(holidaySearchForm);
+
+		// 検索条件で祝日一覧を取得
+		List<Holiday> holidayList =
+				holidayService.getHolidayList(holidaySearchForm);
 
 		// 検索結果の件数を取得
-		int totalCount = holidayService.getHolidayCount(holidaySearchForm);
+		int totalCount =
+				holidayService.getHolidayCount(holidaySearchForm);
 
-		//取得した祝日一覧を画面へ渡す
+		// 取得した祝日一覧を画面へ渡す
 		model.addAttribute("holidayList", holidayList);
 
 		// 検索結果件数を画面へ渡す
 		model.addAttribute("totalCount", totalCount);
 
-		//検索条件を画面へ渡す
+		// 検索条件を画面へ渡す
 		model.addAttribute("holidaySearchForm", holidaySearchForm);
 
+		// 新規登録フォームを画面へ渡す
+		model.addAttribute("holidayDetailForm", new HolidayDetailForm());
+
 		return "holiday/index";
+	}
+
+	/**
+	 * 祝日新規登録
+	 */
+	@PostMapping("/create")
+	public String postCreate(
+			@ModelAttribute @Valid HolidayDetailForm holidayDetailForm,
+			BindingResult bindingResult,
+			Model model) {
+
+		// 入力チェックエラー
+		if (bindingResult.hasErrors()) {
+
+			HolidaySearchForm holidaySearchForm =
+					new HolidaySearchForm();
+
+			// 一覧を再取得
+			List<Holiday> holidayList =
+					holidayService.getHolidayList(holidaySearchForm);
+
+			int totalCount =
+					holidayService.getHolidayCount(holidaySearchForm);
+
+			model.addAttribute(
+					"holidayList",
+					holidayList);
+
+			model.addAttribute(
+					"totalCount",
+					totalCount);
+
+			model.addAttribute(
+					"holidaySearchForm",
+					holidaySearchForm);
+
+			return "holiday/index";
+		}
+
+		// FormからHolidayへ詰め替え
+		Holiday holiday = new Holiday();
+
+		holiday.setYyyymmdd(
+				LocalDate.parse(
+						holidayDetailForm.getYyyymmdd()));
+
+		holiday.setHolidayName(
+				holidayDetailForm.getHolidayName());
+
+		// 登録
+		holidayService.insertHoliday(holiday);
+
+		return "redirect:/holiday/index";
 	}
 }

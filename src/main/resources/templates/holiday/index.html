@@ -21,38 +21,39 @@
 					検索条件
 				</div>
 
-				<div class="card-body">
+				<div class="card-body px-4">
 
 					<form th:action="@{/holiday/index}" th:object="${holidaySearchForm}" method="get">
 
 						<div class="row mb-3">
 
 							<div class="col-md-4">
-								<label class="form-label">日付:</label>
+								<label class="form-label">
+									日付:
+								</label>
 
 								<input type="date" class="form-control" th:field="*{yyyymmdd}">
 							</div>
 
 							<div class="col-md-4">
-								<label class="form-label">祝日名:</label>
+								<label class="form-label">
+									祝日名:
+								</label>
 
 								<input type="text" class="form-control" th:field="*{holidayName}">
 							</div>
 
 						</div>
 
-						<div class="text-end">
+						<!-- 検索ボタン -->
+						<div class="d-flex justify-content-end">
 
 							<a th:href="@{/holiday/index}" class="btn btn-warning me-2">
-
 								クリア
-
 							</a>
 
 							<button type="submit" class="btn btn-info">
-
 								検索
-
 							</button>
 
 						</div>
@@ -63,27 +64,50 @@
 
 			</div>
 
+
 			<!-- 検索結果 -->
 			<div class="card mb-4">
+
 				<div class="card-header bg-light py-3 px-4">
 					検索結果
 				</div>
 
 				<div class="card-body">
 
+					<!-- 操作ボタン -->
+					<div class="d-flex justify-content-end mb-3">
+
+						<button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
+							data-bs-target="#createModal">
+							新規
+						</button>
+
+						<button type="button" class="btn btn-primary me-2" id="updateButton" disabled>
+							更新
+						</button>
+
+						<button type="button" class="btn btn-danger" id="deleteButton" disabled>
+							削除
+						</button>
+
+					</div>
+
+					<!-- 一覧 -->
 					<table class="table table-hover">
 
 						<thead class="table-dark">
-
 							<tr>
-								<th>#</th>
-								<th>日付</th>
+								<th style="width: 5%;">#</th>
+								<th style="width: 30%;">日付</th>
 								<th>祝日名</th>
 							</tr>
 						</thead>
+
 						<tbody>
+
 							<tr th:each="holiday : ${holidayList}" style="cursor: pointer;"
 								onclick="this.querySelector('input[type=radio]').checked = true;">
+
 								<td>
 									<input type="radio" name="selectedHoliday" th:value="${holiday.id}">
 								</td>
@@ -91,14 +115,21 @@
 								<td th:text="${holiday.yyyymmdd}"></td>
 
 								<td th:text="${holiday.holidayName}"></td>
+
 							</tr>
+
 						</tbody>
+
 					</table>
+
 				</div>
+
 			</div>
+
 
 			<!-- ページング -->
 			<nav>
+
 				<ul class="pagination justify-content-center">
 
 					<li class="page-item">
@@ -120,7 +151,87 @@
 					</li>
 
 				</ul>
+
 			</nav>
+
+			<!-- 新規登録モーダル -->
+			<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+
+				<div class="modal-dialog">
+
+					<div class="modal-content">
+
+						<form th:action="@{/holiday/create}" th:object="${holidayDetailForm}" method="post">
+
+							<!-- ヘッダー -->
+							<div class="modal-header">
+
+								<h5 class="modal-title">
+									祝日新規登録
+								</h5>
+
+								<button type="button" class="btn-close" data-bs-dismiss="modal">
+								</button>
+
+							</div>
+
+							<!-- 入力部分 -->
+							<div class="modal-body">
+
+								<!-- 日付 -->
+								<div class="mb-3">
+
+									<label for="createYyyymmdd" class="form-label">
+										日付:
+									</label>
+
+									<input type="date" id="createYyyymmdd" class="form-control" th:field="*{yyyymmdd}">
+
+									<div class="text-danger small" th:if="${#fields.hasErrors('yyyymmdd')}"
+										th:errors="*{yyyymmdd}">
+									</div>
+
+								</div>
+
+								<!-- 祝日名 -->
+								<div class="mb-3">
+
+									<label for="createHolidayName" class="form-label">
+										祝日名:
+									</label>
+
+									<input type="text" id="createHolidayName" class="form-control"
+										th:field="*{holidayName}">
+
+									<div class="text-danger small" th:if="${#fields.hasErrors('holidayName')}"
+										th:errors="*{holidayName}">
+									</div>
+
+								</div>
+
+							</div>
+
+							<!-- ボタン -->
+							<div class="modal-footer">
+
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+									キャンセル
+								</button>
+
+								<button type="submit" class="btn btn-success">
+									登録
+								</button>
+
+							</div>
+
+						</form>
+
+					</div>
+
+				</div>
+
+			</div>
+
 		</div>
 
 	</div>
