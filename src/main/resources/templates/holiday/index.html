@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<head>
+	<title>祝日マスタ管理</title>
+</head>
+
+<body>
+
+	<div layout:fragment="content">
+
+		<div class="container">
+
+			<h2 class="mb-4">祝日マスタ管理</h2>
+
+			<!-- 検索条件 -->
+			<div class="card mb-4">
+
+				<div class="card-header bg-light py-3 px-4">
+					検索条件
+				</div>
+
+				<div class="card-body">
+
+					<form th:action="@{/holiday/index}" th:object="${holidaySearchForm}" method="get">
+
+						<div class="row mb-3">
+
+							<div class="col-md-4">
+								<label class="form-label">日付:</label>
+
+								<input type="date" class="form-control" th:field="*{yyyymmdd}">
+							</div>
+
+							<div class="col-md-4">
+								<label class="form-label">祝日名:</label>
+
+								<input type="text" class="form-control" th:field="*{holidayName}">
+							</div>
+
+						</div>
+
+						<div class="text-end">
+
+							<a th:href="@{/holiday/index}" class="btn btn-warning me-2">
+
+								クリア
+
+							</a>
+
+							<button type="submit" class="btn btn-info">
+
+								検索
+
+							</button>
+
+						</div>
+
+					</form>
+
+				</div>
+
+			</div>
+
+			<!-- 検索結果 -->
+			<div class="card mb-4">
+				<div class="card-header bg-light py-3 px-4">
+					検索結果
+				</div>
+
+				<div class="card-body">
+
+					<table class="table table-hover">
+
+						<thead class="table-dark">
+
+							<tr>
+								<th>#</th>
+								<th>日付</th>
+								<th>祝日名</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="holiday : ${holidayList}" style="cursor: pointer;"
+								onclick="this.querySelector('input[type=radio]').checked = true;">
+								<td>
+									<input type="radio" name="selectedHoliday" th:value="${holiday.id}">
+								</td>
+
+								<td th:text="${holiday.yyyymmdd}"></td>
+
+								<td th:text="${holiday.holidayName}"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- ページング -->
+			<nav>
+				<ul class="pagination justify-content-center">
+
+					<li class="page-item">
+						<a class="page-link" href="#">
+							前へ
+						</a>
+					</li>
+
+					<li class="page-item active">
+						<span class="page-link">
+							1
+						</span>
+					</li>
+
+					<li class="page-item">
+						<a class="page-link" href="#">
+							次へ
+						</a>
+					</li>
+
+				</ul>
+			</nav>
+		</div>
+
+	</div>
+
+</body>
+
+</html>
