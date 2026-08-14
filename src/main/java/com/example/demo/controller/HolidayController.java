@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.domain.model.Holiday;
 import com.example.demo.domain.service.HolidayService;
@@ -35,12 +37,10 @@ public class HolidayController {
 			Model model) {
 
 		// 検索条件で祝日一覧を取得
-		List<Holiday> holidayList =
-				holidayService.getHolidayList(holidaySearchForm);
+		List<Holiday> holidayList = holidayService.getHolidayList(holidaySearchForm);
 
 		// 検索結果の件数を取得
-		int totalCount =
-				holidayService.getHolidayCount(holidaySearchForm);
+		int totalCount = holidayService.getHolidayCount(holidaySearchForm);
 
 		// 取得した祝日一覧を画面へ渡す
 		model.addAttribute("holidayList", holidayList);
@@ -51,8 +51,13 @@ public class HolidayController {
 		// 検索条件を画面へ渡す
 		model.addAttribute("holidaySearchForm", holidaySearchForm);
 
-		// 新規登録フォームを画面へ渡す
-		model.addAttribute("holidayDetailForm", new HolidayDetailForm());
+		// 新規登録フォーム
+		if (!model.containsAttribute("holidayDetailForm")) {
+
+			model.addAttribute(
+					"holidayDetailForm",
+					new HolidayDetailForm());
+		}
 
 		return "holiday/index";
 	}
@@ -64,20 +69,23 @@ public class HolidayController {
 	public String postCreate(
 			@ModelAttribute @Valid HolidayDetailForm holidayDetailForm,
 			BindingResult bindingResult,
-			Model model) {
+			@RequestParam(required = false) String searchYyyymmdd,
+			@RequestParam(required = false) String searchHolidayName,
+			Model model,
+			RedirectAttributes redirectAttributes) {
 
 		// 入力チェックエラー
 		if (bindingResult.hasErrors()) {
 
-			HolidaySearchForm holidaySearchForm =
-					new HolidaySearchForm();
+			HolidaySearchForm holidaySearchForm = new HolidaySearchForm();
 
-			// 一覧を再取得
-			List<Holiday> holidayList =
-					holidayService.getHolidayList(holidaySearchForm);
+			holidaySearchForm.setYyyymmdd(searchYyyymmdd);
+			holidaySearchForm.setHolidayName(searchHolidayName);
 
-			int totalCount =
-					holidayService.getHolidayCount(holidaySearchForm);
+			// 検索条件で一覧を再取得
+			List<Holiday> holidayList = holidayService.getHolidayList(holidaySearchForm);
+
+			int totalCount = holidayService.getHolidayCount(holidaySearchForm);
 
 			model.addAttribute(
 					"holidayList",
@@ -90,6 +98,10 @@ public class HolidayController {
 			model.addAttribute(
 					"holidaySearchForm",
 					holidaySearchForm);
+
+			model.addAttribute(
+					"openCreateModal",
+					true);
 
 			return "holiday/index";
 		}
@@ -107,6 +119,99 @@ public class HolidayController {
 		// 登録
 		holidayService.insertHoliday(holiday);
 
+		// 登録前の検索条件を引き継ぐ
+		setSearchCondition(
+				redirectAttributes,
+				searchYyyymmdd,
+				searchHolidayName);
+
 		return "redirect:/holiday/index";
+	}
+
+	/**
+	 * 祝日更新
+	 */
+	@PostMapping("/update")
+	public String postUpdate(
+			@RequestParam Long id,
+			@RequestParam String yyyymmdd,
+			@RequestParam String holidayName,
+			@RequestParam(required = false) String searchYyyymmdd,
+			@RequestParam(required = false) String searchHolidayName,
+			RedirectAttributes redirectAttributes) {
+
+		// 更新対象を作成
+		Holiday holiday = new Holiday();
+
+		holiday.setId(id);
+
+		holiday.setYyyymmdd(
+				LocalDate.parse(yyyymmdd));
+
+		holiday.setHolidayName(
+				holidayName);
+
+		// 更新
+		holidayService.updateHoliday(holiday);
+
+		// 更新前の検索条件を引き継ぐ
+		setSearchCondition(
+				redirectAttributes,
+				searchYyyymmdd,
+				searchHolidayName);
+
+		return "redirect:/holiday/index";
+	}
+
+	/**
+	 * 祝日削除
+	 */
+	@PostMapping("/delete")
+	public String postDelete(
+			@RequestParam Long id,
+			@RequestParam(required = false) String searchYyyymmdd,
+			@RequestParam(required = false) String searchHolidayName,
+			RedirectAttributes redirectAttributes) {
+
+		// 削除
+		holidayService.deleteHoliday(id);
+
+		// 削除前の検索条件を引き継ぐ
+		setSearchCondition(
+				redirectAttributes,
+				searchYyyymmdd,
+				searchHolidayName);
+
+		return "redirect:/holiday/index";
+	}
+
+	/**
+	 * 検索条件をリダイレクト先へ引き継ぐ
+	 */
+	private void setSearchCondition(
+			RedirectAttributes redirectAttributes,
+			String searchYyyymmdd,
+			String searchHolidayName) {
+
+		if (searchYyyymmdd != null
+				&& !searchYyyymmdd.isBlank()) {
+
+			redirectAttributes.addAttribute(
+					"yyyymmdd",
+					searchYyyymmdd);
+		}
+
+		if (searchHolidayName != null
+				&& !searchHolidayName.isBlank()) {
+
+			redirectAttributes.addAttribute(
+					"holidayName",
+					searchHolidayName);
+		}
+
+		// 更新・登録後は1ページ目から再検索
+		redirectAttributes.addAttribute(
+				"page",
+				1);
 	}
 }

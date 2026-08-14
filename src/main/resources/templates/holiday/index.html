@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}">
 
 <head>
@@ -14,7 +15,10 @@
 
 			<h2 class="mb-4">祝日マスタ管理</h2>
 
+
+			<!-- ============================= -->
 			<!-- 検索条件 -->
+			<!-- ============================= -->
 			<div class="card mb-4">
 
 				<div class="card-header bg-light py-3 px-4">
@@ -23,36 +27,49 @@
 
 				<div class="card-body px-4">
 
-					<form th:action="@{/holiday/index}" th:object="${holidaySearchForm}" method="get">
+					<form th:action="@{/holiday/index}"
+						th:object="${holidaySearchForm}"
+						method="get">
 
 						<div class="row mb-3">
 
 							<div class="col-md-4">
+
 								<label class="form-label">
 									日付:
 								</label>
 
-								<input type="date" class="form-control" th:field="*{yyyymmdd}">
+								<input type="date"
+									class="form-control"
+									th:field="*{yyyymmdd}">
+
 							</div>
 
 							<div class="col-md-4">
+
 								<label class="form-label">
 									祝日名:
 								</label>
 
-								<input type="text" class="form-control" th:field="*{holidayName}">
+								<input type="text"
+									class="form-control"
+									th:field="*{holidayName}">
+
 							</div>
 
 						</div>
 
+
 						<!-- 検索ボタン -->
 						<div class="d-flex justify-content-end">
 
-							<a th:href="@{/holiday/index}" class="btn btn-warning me-2">
+							<a th:href="@{/holiday/index}"
+								class="btn btn-warning me-2">
 								クリア
 							</a>
 
-							<button type="submit" class="btn btn-info">
+							<button type="submit"
+								class="btn btn-info">
 								検索
 							</button>
 
@@ -65,7 +82,9 @@
 			</div>
 
 
+			<!-- ============================= -->
 			<!-- 検索結果 -->
+			<!-- ============================= -->
 			<div class="card mb-4">
 
 				<div class="card-header bg-light py-3 px-4">
@@ -77,44 +96,63 @@
 					<!-- 操作ボタン -->
 					<div class="d-flex justify-content-end mb-3">
 
-						<button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
+						<button type="button"
+							class="btn btn-success me-2"
+							data-bs-toggle="modal"
 							data-bs-target="#createModal">
 							新規
 						</button>
 
-						<button type="button" class="btn btn-primary me-2" id="updateButton" disabled>
+						<button type="button"
+							class="btn btn-primary me-2"
+							id="updateButton"
+							disabled>
 							更新
 						</button>
 
-						<button type="button" class="btn btn-danger" id="deleteButton" disabled>
+						<button type="button"
+							class="btn btn-danger"
+							id="deleteButton"
+							disabled>
 							削除
 						</button>
 
 					</div>
 
+
 					<!-- 一覧 -->
 					<table class="table table-hover">
 
 						<thead class="table-dark">
+
 							<tr>
 								<th style="width: 5%;">#</th>
 								<th style="width: 30%;">日付</th>
 								<th>祝日名</th>
 							</tr>
+
 						</thead>
 
 						<tbody>
 
-							<tr th:each="holiday : ${holidayList}" style="cursor: pointer;"
-								onclick="this.querySelector('input[type=radio]').checked = true;">
+							<tr th:each="holiday : ${holidayList}"
+								style="cursor: pointer;">
 
 								<td>
-									<input type="radio" name="selectedHoliday" th:value="${holiday.id}">
+
+									<input type="radio"
+										name="selectedHoliday"
+										th:value="${holiday.id}"
+										th:data-yyyymmdd="${holiday.yyyymmdd}"
+										th:data-holiday-name="${holiday.holidayName}">
+
 								</td>
 
-								<td th:text="${holiday.yyyymmdd}"></td>
+								<td th:text="${holiday.yyyymmdd}">
+								</td>
 
-								<td th:text="${holiday.holidayName}"></td>
+								<td th:text="${holiday.holidayName}">
+								</td>
 
 							</tr>
 
@@ -127,99 +165,375 @@
 			</div>
 
 
+			<!-- ============================= -->
 			<!-- ページング -->
+			<!-- ============================= -->
 			<nav>
 
 				<ul class="pagination justify-content-center">
 
 					<li class="page-item">
+
 						<a class="page-link" href="#">
 							前へ
 						</a>
+
 					</li>
 
 					<li class="page-item active">
+
 						<span class="page-link">
 							1
 						</span>
+
 					</li>
 
 					<li class="page-item">
+
 						<a class="page-link" href="#">
 							次へ
 						</a>
+
 					</li>
 
 				</ul>
 
 			</nav>
 
+
+			<!-- ============================= -->
 			<!-- 新規登録モーダル -->
-			<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+			<!-- ============================= -->
+			<div class="modal fade"
+				id="createModal"
+				tabindex="-1"
+				aria-hidden="true">
+
+				<div class="modal-dialog modal-lg">
+
+					<div class="modal-content">
+
+						<form th:action="@{/holiday/create}"
+							th:object="${holidayDetailForm}"
+							method="post"
+							id="createHolidayForm">
+
+							<!-- 登録後の再検索用 -->
+							<input type="hidden"
+								name="searchYyyymmdd"
+								th:value="${holidaySearchForm.yyyymmdd}">
+
+							<input type="hidden"
+								name="searchHolidayName"
+								th:value="${holidaySearchForm.holidayName}">
+
+
+							<!-- ヘッダー -->
+							<div class="modal-header bg-info text-white">
+
+								<h5 class="modal-title fw-bold">
+									祝日登録
+								</h5>
+
+								<button type="button"
+									class="btn-close"
+									data-bs-dismiss="modal"
+									aria-label="閉じる">
+								</button>
+
+							</div>
+
+
+							<!-- モーダル本文 -->
+							<div class="modal-body p-4">
+
+								<div class="card">
+
+									<div class="card-header bg-light py-3">
+										祝日情報
+									</div>
+
+									<div class="card-body py-4">
+
+										<div class="row">
+
+											<!-- 日付 -->
+											<div class="col-md-4">
+
+												<label for="createYyyymmdd"
+													class="form-label">
+													日付:
+												</label>
+
+												<input type="date"
+													id="createYyyymmdd"
+													class="form-control"
+													th:field="*{yyyymmdd}">
+
+												<div class="invalid-feedback">
+													必須入力です。
+												</div>
+
+											</div>
+
+
+											<!-- 祝日名 -->
+											<div class="col-md-4">
+
+												<label for="createHolidayName"
+													class="form-label">
+													祝日名:
+												</label>
+
+												<input type="text"
+													id="createHolidayName"
+													class="form-control"
+													th:field="*{holidayName}">
+
+												<div class="invalid-feedback">
+													必須入力です。
+												</div>
+
+											</div>
+
+										</div>
+
+									</div>
+
+								</div>
+
+							</div>
+
+
+							<!-- フッター -->
+							<div class="modal-footer py-3">
+
+								<button type="button"
+									class="btn btn-secondary"
+									data-bs-dismiss="modal">
+									キャンセル
+								</button>
+
+								<button type="button"
+									class="btn btn-success"
+									id="createHolidayButton">
+									登録
+								</button>
+
+							</div>
+
+						</form>
+
+					</div>
+
+				</div>
+
+			</div>
+
+
+			<!-- ============================= -->
+			<!-- 更新モーダル -->
+			<!-- ============================= -->
+			<div class="modal fade"
+				id="updateModal"
+				tabindex="-1"
+				aria-hidden="true">
+
+				<div class="modal-dialog modal-lg">
+
+					<div class="modal-content">
+
+						<form th:action="@{/holiday/update}"
+							method="post"
+							id="updateHolidayForm">
+
+							<!-- 更新後の再検索用 -->
+							<input type="hidden"
+								name="searchYyyymmdd"
+								th:value="${holidaySearchForm.yyyymmdd}">
+
+							<input type="hidden"
+								name="searchHolidayName"
+								th:value="${holidaySearchForm.holidayName}">
+
+							<!-- 更新対象ID -->
+							<input type="hidden"
+								id="updateId"
+								name="id">
+
+
+							<!-- ヘッダー -->
+							<div class="modal-header bg-info text-white">
+
+								<h5 class="modal-title fw-bold">
+									祝日更新
+								</h5>
+
+								<button type="button"
+									class="btn-close"
+									data-bs-dismiss="modal"
+									aria-label="閉じる">
+								</button>
+
+							</div>
+
+
+							<!-- モーダル本文 -->
+							<div class="modal-body p-4">
+
+								<div class="card">
+
+									<div class="card-header bg-light py-3">
+										祝日情報
+									</div>
+
+									<div class="card-body py-4">
+
+										<div class="row">
+
+											<!-- 日付 -->
+											<div class="col-md-4">
+
+												<label for="updateYyyymmdd"
+													class="form-label">
+													日付:
+												</label>
+
+												<input type="date"
+													id="updateYyyymmdd"
+													name="yyyymmdd"
+													class="form-control">
+
+												<div class="invalid-feedback">
+													必須入力です。
+												</div>
+
+											</div>
+
+
+											<!-- 祝日名 -->
+											<div class="col-md-4">
+
+												<label for="updateHolidayName"
+													class="form-label">
+													祝日名:
+												</label>
+
+												<input type="text"
+													id="updateHolidayName"
+													name="holidayName"
+													class="form-control">
+
+												<div class="invalid-feedback">
+													必須入力です。
+												</div>
+
+											</div>
+
+										</div>
+
+									</div>
+
+								</div>
+
+							</div>
+
+
+							<!-- フッター -->
+							<div class="modal-footer py-3">
+
+								<button type="button"
+									class="btn btn-secondary"
+									data-bs-dismiss="modal">
+									キャンセル
+								</button>
+
+								<button type="button"
+									class="btn btn-primary"
+									id="updateHolidayButton">
+									更新
+								</button>
+
+							</div>
+
+						</form>
+
+					</div>
+
+				</div>
+
+			</div>
+
+
+			<!-- ============================= -->
+			<!-- 削除モーダル -->
+			<!-- ============================= -->
+			<div class="modal fade"
+				id="deleteModal"
+				tabindex="-1"
+				aria-hidden="true">
 
 				<div class="modal-dialog">
 
 					<div class="modal-content">
 
-						<form th:action="@{/holiday/create}" th:object="${holidayDetailForm}" method="post">
+						<form th:action="@{/holiday/delete}"
+							method="post"
+							id="deleteHolidayForm">
+
+							<!-- 削除対象ID -->
+							<input type="hidden"
+								id="deleteId"
+								name="id">
+
+							<!-- 削除後の再検索用 -->
+							<input type="hidden"
+								name="searchYyyymmdd"
+								th:value="${holidaySearchForm.yyyymmdd}">
+
+							<input type="hidden"
+								name="searchHolidayName"
+								th:value="${holidaySearchForm.holidayName}">
+
 
 							<!-- ヘッダー -->
-							<div class="modal-header">
+							<div class="modal-header bg-info text-white">
 
-								<h5 class="modal-title">
-									祝日新規登録
+								<h5 class="modal-title fw-bold">
+									祝日削除
 								</h5>
 
-								<button type="button" class="btn-close" data-bs-dismiss="modal">
+								<button type="button"
+									class="btn-close"
+									data-bs-dismiss="modal"
+									aria-label="閉じる">
 								</button>
 
 							</div>
 
-							<!-- 入力部分 -->
-							<div class="modal-body">
 
-								<!-- 日付 -->
-								<div class="mb-3">
+							<!-- 本文 -->
+							<div class="modal-body py-4">
 
-									<label for="createYyyymmdd" class="form-label">
-										日付:
-									</label>
-
-									<input type="date" id="createYyyymmdd" class="form-control" th:field="*{yyyymmdd}">
-
-									<div class="text-danger small" th:if="${#fields.hasErrors('yyyymmdd')}"
-										th:errors="*{yyyymmdd}">
-									</div>
-
-								</div>
-
-								<!-- 祝日名 -->
-								<div class="mb-3">
-
-									<label for="createHolidayName" class="form-label">
-										祝日名:
-									</label>
-
-									<input type="text" id="createHolidayName" class="form-control"
-										th:field="*{holidayName}">
-
-									<div class="text-danger small" th:if="${#fields.hasErrors('holidayName')}"
-										th:errors="*{holidayName}">
-									</div>
-
-								</div>
+								<p class="mb-0">
+									選択した祝日を削除しますか？
+								</p>
 
 							</div>
 
-							<!-- ボタン -->
-							<div class="modal-footer">
 
-								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+							<!-- フッター -->
+							<div class="modal-footer py-3">
+
+								<button type="button"
+									class="btn btn-secondary"
+									data-bs-dismiss="modal">
 									キャンセル
 								</button>
 
-								<button type="submit" class="btn btn-success">
-									登録
+								<button type="submit"
+									class="btn btn-danger">
+									削除
 								</button>
 
 							</div>
@@ -235,6 +549,328 @@
 		</div>
 
 	</div>
+
+
+	<!-- ============================= -->
+	<!-- 画面固有JavaScript -->
+	<!-- ============================= -->
+	<th:block layout:fragment="script">
+
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+
+				const radioButtons =
+					document.querySelectorAll(
+						'input[name="selectedHoliday"]'
+					);
+
+				const updateButton =
+					document.getElementById("updateButton");
+
+				const deleteButton =
+					document.getElementById("deleteButton");
+
+
+				// =============================
+				// 一覧選択
+				// =============================
+
+				radioButtons.forEach(function (radio) {
+
+					radio.addEventListener(
+						"change",
+						function () {
+
+							updateButton.disabled = false;
+							deleteButton.disabled = false;
+
+						}
+					);
+
+
+					// 行をクリックしてもラジオボタンを選択
+					radio.closest("tr").addEventListener(
+						"click",
+						function () {
+
+							radio.checked = true;
+
+							radio.dispatchEvent(
+								new Event("change")
+							);
+
+						}
+					);
+
+				});
+
+
+				// =============================
+				// 新規登録
+				// =============================
+
+				const createButton =
+					document.getElementById(
+						"createHolidayButton"
+					);
+
+				const createForm =
+					document.getElementById(
+						"createHolidayForm"
+					);
+
+				const createYyyymmdd =
+					document.getElementById(
+						"createYyyymmdd"
+					);
+
+				const createHolidayName =
+					document.getElementById(
+						"createHolidayName"
+					);
+
+
+				createButton.addEventListener(
+					"click",
+					function () {
+
+						let hasError = false;
+
+						// エラー表示を初期化
+						createYyyymmdd.classList.remove(
+							"is-invalid"
+						);
+
+						createHolidayName.classList.remove(
+							"is-invalid"
+						);
+
+
+						// 日付必須チェック
+						if (createYyyymmdd.value === "") {
+
+							createYyyymmdd.classList.add(
+								"is-invalid"
+							);
+
+							hasError = true;
+
+						}
+
+
+						// 祝日名必須チェック
+						if (
+							createHolidayName.value.trim()
+							=== ""
+						) {
+
+							createHolidayName.classList.add(
+								"is-invalid"
+							);
+
+							hasError = true;
+
+						}
+
+
+						// エラーの場合は送信しない
+						if (hasError) {
+							return;
+						}
+
+
+						// 正常の場合のみ登録
+						createForm.submit();
+
+					}
+				);
+
+
+				// =============================
+				// 更新モーダル表示
+				// =============================
+
+				updateButton.addEventListener(
+					"click",
+					function () {
+
+						const selectedHoliday =
+							document.querySelector(
+								'input[name="selectedHoliday"]:checked'
+							);
+
+						if (selectedHoliday === null) {
+							return;
+						}
+
+
+						// ID
+						document.getElementById(
+							"updateId"
+						).value =
+							selectedHoliday.value;
+
+
+						// 日付
+						document.getElementById(
+							"updateYyyymmdd"
+						).value =
+							selectedHoliday.dataset.yyyymmdd;
+
+
+						// 祝日名
+						document.getElementById(
+							"updateHolidayName"
+						).value =
+							selectedHoliday.dataset.holidayName;
+
+
+						// モーダル表示
+						const updateModalElement =
+							document.getElementById(
+								"updateModal"
+							);
+
+						const updateModal =
+							bootstrap.Modal
+								.getOrCreateInstance(
+									updateModalElement
+								);
+
+						updateModal.show();
+
+					}
+				);
+
+
+				// =============================
+				// 更新処理
+				// =============================
+
+				const updateHolidayButton =
+					document.getElementById(
+						"updateHolidayButton"
+					);
+
+				const updateHolidayForm =
+					document.getElementById(
+						"updateHolidayForm"
+					);
+
+				const updateYyyymmdd =
+					document.getElementById(
+						"updateYyyymmdd"
+					);
+
+				const updateHolidayName =
+					document.getElementById(
+						"updateHolidayName"
+					);
+
+
+				updateHolidayButton.addEventListener(
+					"click",
+					function () {
+
+						let hasError = false;
+
+
+						// エラー表示を初期化
+						updateYyyymmdd.classList.remove(
+							"is-invalid"
+						);
+
+						updateHolidayName.classList.remove(
+							"is-invalid"
+						);
+
+
+						// 日付必須チェック
+						if (updateYyyymmdd.value === "") {
+
+							updateYyyymmdd.classList.add(
+								"is-invalid"
+							);
+
+							hasError = true;
+
+						}
+
+
+						// 祝日名必須チェック
+						if (
+							updateHolidayName.value.trim()
+							=== ""
+						) {
+
+							updateHolidayName.classList.add(
+								"is-invalid"
+							);
+
+							hasError = true;
+
+						}
+
+
+						// エラーの場合は更新しない
+						if (hasError) {
+							return;
+						}
+
+
+						// 正常の場合のみ更新
+						updateHolidayForm.submit();
+
+					}
+				);
+
+
+				// =============================
+				// 削除モーダル表示
+				// =============================
+
+				deleteButton.addEventListener(
+					"click",
+					function () {
+
+						const selectedHoliday =
+							document.querySelector(
+								'input[name="selectedHoliday"]:checked'
+							);
+
+						if (selectedHoliday === null) {
+							return;
+						}
+
+
+						// 削除対象IDを設定
+						document.getElementById(
+							"deleteId"
+						).value =
+							selectedHoliday.value;
+
+
+						// 削除モーダルを表示
+						const deleteModalElement =
+							document.getElementById(
+								"deleteModal"
+							);
+
+						const deleteModal =
+							bootstrap.Modal
+								.getOrCreateInstance(
+									deleteModalElement
+								);
+
+						deleteModal.show();
+
+					}
+				);
+
+			});
+		</script>
+
+	</th:block>
 
 </body>
 

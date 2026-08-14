@@ -5,6 +5,9 @@ import lombok.Data;
 
 @Data
 public class HolidayDetailForm {
+	
+	//ID
+	private Integer id;
 
 	// 日付
 	@NotBlank(message = "{require_check}")
