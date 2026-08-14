@@ -50,6 +50,9 @@ public class HolidayController {
 
 		// 検索条件を画面へ渡す
 		model.addAttribute("holidaySearchForm", holidaySearchForm);
+		
+		// メニューバーの祝日マスタ管理をアクティブ表示
+		model.addAttribute("activePage", "holiday");
 
 		// 新規登録フォーム
 		if (!model.containsAttribute("holidayDetailForm")) {
