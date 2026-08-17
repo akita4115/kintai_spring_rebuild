@@ -41,12 +41,21 @@ public class HolidayController {
 
 		// 検索結果の件数を取得
 		int totalCount = holidayService.getHolidayCount(holidaySearchForm);
+		
+		//総ページ数を計算
+		int totalPages = (int) Math.ceil((double) totalCount / holidaySearchForm.getPageSize());
+		
+		
+		
 
 		// 取得した祝日一覧を画面へ渡す
 		model.addAttribute("holidayList", holidayList);
 
 		// 検索結果件数を画面へ渡す
 		model.addAttribute("totalCount", totalCount);
+		
+		//総ページ数を画面へ渡す
+		model.addAttribute("totalPages", totalPages);
 
 		// 検索条件を画面へ渡す
 		model.addAttribute("holidaySearchForm", holidaySearchForm);

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}">
 
 <head>
@@ -16,9 +15,9 @@
 			<h2 class="mb-4">祝日マスタ管理</h2>
 
 
-			<!-- ============================= -->
+
 			<!-- 検索条件 -->
-			<!-- ============================= -->
+
 			<div class="card mb-4">
 
 				<div class="card-header bg-light py-3 px-4">
@@ -27,9 +26,7 @@
 
 				<div class="card-body px-4">
 
-					<form th:action="@{/holiday/index}"
-						th:object="${holidaySearchForm}"
-						method="get">
+					<form th:action="@{/holiday/index}" th:object="${holidaySearchForm}" method="get">
 
 						<div class="row mb-3">
 
@@ -39,9 +36,7 @@
 									日付:
 								</label>
 
-								<input type="date"
-									class="form-control"
-									th:field="*{yyyymmdd}">
+								<input type="date" class="form-control" th:field="*{yyyymmdd}">
 
 							</div>
 
@@ -51,9 +46,7 @@
 									祝日名:
 								</label>
 
-								<input type="text"
-									class="form-control"
-									th:field="*{holidayName}">
+								<input type="text" class="form-control" th:field="*{holidayName}">
 
 							</div>
 
@@ -63,13 +56,11 @@
 						<!-- 検索ボタン -->
 						<div class="d-flex justify-content-end">
 
-							<a th:href="@{/holiday/index}"
-								class="btn btn-warning me-2">
+							<a th:href="@{/holiday/index}" class="btn btn-warning me-2">
 								クリア
 							</a>
 
-							<button type="submit"
-								class="btn btn-info">
+							<button type="submit" class="btn btn-info">
 								検索
 							</button>
 
@@ -82,9 +73,9 @@
 			</div>
 
 
-			<!-- ============================= -->
+
 			<!-- 検索結果 -->
-			<!-- ============================= -->
+
 			<div class="card mb-4">
 
 				<div class="card-header bg-light py-3 px-4">
@@ -96,24 +87,16 @@
 					<!-- 操作ボタン -->
 					<div class="d-flex justify-content-end mb-3">
 
-						<button type="button"
-							class="btn btn-success me-2"
-							data-bs-toggle="modal"
+						<button type="button" class="btn btn-success me-2" data-bs-toggle="modal"
 							data-bs-target="#createModal">
 							新規
 						</button>
 
-						<button type="button"
-							class="btn btn-primary me-2"
-							id="updateButton"
-							disabled>
+						<button type="button" class="btn btn-primary me-2" id="updateButton" disabled>
 							更新
 						</button>
 
-						<button type="button"
-							class="btn btn-danger"
-							id="deleteButton"
-							disabled>
+						<button type="button" class="btn btn-danger" id="deleteButton" disabled>
 							削除
 						</button>
 
@@ -135,14 +118,11 @@
 
 						<tbody>
 
-							<tr th:each="holiday : ${holidayList}"
-								style="cursor: pointer;">
+							<tr th:each="holiday : ${holidayList}" style="cursor: pointer;">
 
 								<td>
 
-									<input type="radio"
-										name="selectedHoliday"
-										th:value="${holiday.id}"
+									<input type="radio" name="selectedHoliday" th:value="${holiday.id}"
 										th:data-yyyymmdd="${holiday.yyyymmdd}"
 										th:data-holiday-name="${holiday.holidayName}">
 
@@ -160,72 +140,84 @@
 
 					</table>
 
+					<!-- ページング -->
+
+
+					<nav th:if="${totalPages > 0}">
+
+						<ul class="pagination justify-content-center">
+
+							<!-- 前へ -->
+							<li class="page-item" th:classappend="${holidaySearchForm.page <= 1} ? ' disabled' : ''">
+
+								<a class="page-link" th:href="@{/holiday/index(
+					page=${holidaySearchForm.page - 1},
+					yyyymmdd=${holidaySearchForm.yyyymmdd},
+					holidayName=${holidaySearchForm.holidayName}
+				)}">
+									前
+								</a>
+
+							</li>
+
+
+							<!-- ページ番号 -->
+							<li class="page-item" th:each="pageNo : ${#numbers.sequence(1, totalPages)}"
+								th:classappend="${pageNo == holidaySearchForm.page} ? ' active' : ''">
+
+								<a class="page-link" th:href="@{/holiday/index(
+					page=${pageNo},
+					yyyymmdd=${holidaySearchForm.yyyymmdd},
+					holidayName=${holidaySearchForm.holidayName}
+				)}" th:text="${pageNo}">
+								</a>
+
+							</li>
+
+
+							<!-- 次へ -->
+							<li class="page-item"
+								th:classappend="${holidaySearchForm.page >= totalPages} ? ' disabled' : ''">
+
+								<a class="page-link" th:href="@{/holiday/index(
+					page=${holidaySearchForm.page + 1},
+					yyyymmdd=${holidaySearchForm.yyyymmdd},
+					holidayName=${holidaySearchForm.holidayName}
+				)}">
+									次
+								</a>
+
+							</li>
+
+						</ul>
+
+					</nav>
+
+
 				</div>
 
 			</div>
 
 
-			<!-- ============================= -->
-			<!-- ページング -->
-			<!-- ============================= -->
-			<nav>
-
-				<ul class="pagination justify-content-center">
-
-					<li class="page-item">
-
-						<a class="page-link" href="#">
-							前へ
-						</a>
-
-					</li>
-
-					<li class="page-item active">
-
-						<span class="page-link">
-							1
-						</span>
-
-					</li>
-
-					<li class="page-item">
-
-						<a class="page-link" href="#">
-							次へ
-						</a>
-
-					</li>
-
-				</ul>
-
-			</nav>
 
 
-			<!-- ============================= -->
+
+
 			<!-- 新規登録モーダル -->
-			<!-- ============================= -->
-			<div class="modal fade"
-				id="createModal"
-				tabindex="-1"
-				aria-hidden="true">
+
+			<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
 
 				<div class="modal-dialog modal-lg">
 
 					<div class="modal-content">
 
-						<form th:action="@{/holiday/create}"
-							th:object="${holidayDetailForm}"
-							method="post"
+						<form th:action="@{/holiday/create}" th:object="${holidayDetailForm}" method="post"
 							id="createHolidayForm">
 
 							<!-- 登録後の再検索用 -->
-							<input type="hidden"
-								name="searchYyyymmdd"
-								th:value="${holidaySearchForm.yyyymmdd}">
+							<input type="hidden" name="searchYyyymmdd" th:value="${holidaySearchForm.yyyymmdd}">
 
-							<input type="hidden"
-								name="searchHolidayName"
-								th:value="${holidaySearchForm.holidayName}">
+							<input type="hidden" name="searchHolidayName" th:value="${holidaySearchForm.holidayName}">
 
 
 							<!-- ヘッダー -->
@@ -235,10 +227,7 @@
 									祝日登録
 								</h5>
 
-								<button type="button"
-									class="btn-close"
-									data-bs-dismiss="modal"
-									aria-label="閉じる">
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる">
 								</button>
 
 							</div>
@@ -260,14 +249,11 @@
 											<!-- 日付 -->
 											<div class="col-md-4">
 
-												<label for="createYyyymmdd"
-													class="form-label">
+												<label for="createYyyymmdd" class="form-label">
 													日付:
 												</label>
 
-												<input type="date"
-													id="createYyyymmdd"
-													class="form-control"
+												<input type="date" id="createYyyymmdd" class="form-control"
 													th:field="*{yyyymmdd}">
 
 												<div class="invalid-feedback">
@@ -280,14 +266,11 @@
 											<!-- 祝日名 -->
 											<div class="col-md-4">
 
-												<label for="createHolidayName"
-													class="form-label">
+												<label for="createHolidayName" class="form-label">
 													祝日名:
 												</label>
 
-												<input type="text"
-													id="createHolidayName"
-													class="form-control"
+												<input type="text" id="createHolidayName" class="form-control"
 													th:field="*{holidayName}">
 
 												<div class="invalid-feedback">
@@ -308,15 +291,11 @@
 							<!-- フッター -->
 							<div class="modal-footer py-3">
 
-								<button type="button"
-									class="btn btn-secondary"
-									data-bs-dismiss="modal">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
 									キャンセル
 								</button>
 
-								<button type="button"
-									class="btn btn-success"
-									id="createHolidayButton">
+								<button type="button" class="btn btn-success" id="createHolidayButton">
 									登録
 								</button>
 
@@ -331,35 +310,24 @@
 			</div>
 
 
-			<!-- ============================= -->
+
 			<!-- 更新モーダル -->
-			<!-- ============================= -->
-			<div class="modal fade"
-				id="updateModal"
-				tabindex="-1"
-				aria-hidden="true">
+
+			<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
 
 				<div class="modal-dialog modal-lg">
 
 					<div class="modal-content">
 
-						<form th:action="@{/holiday/update}"
-							method="post"
-							id="updateHolidayForm">
+						<form th:action="@{/holiday/update}" method="post" id="updateHolidayForm">
 
 							<!-- 更新後の再検索用 -->
-							<input type="hidden"
-								name="searchYyyymmdd"
-								th:value="${holidaySearchForm.yyyymmdd}">
+							<input type="hidden" name="searchYyyymmdd" th:value="${holidaySearchForm.yyyymmdd}">
 
-							<input type="hidden"
-								name="searchHolidayName"
-								th:value="${holidaySearchForm.holidayName}">
+							<input type="hidden" name="searchHolidayName" th:value="${holidaySearchForm.holidayName}">
 
 							<!-- 更新対象ID -->
-							<input type="hidden"
-								id="updateId"
-								name="id">
+							<input type="hidden" id="updateId" name="id">
 
 
 							<!-- ヘッダー -->
@@ -369,10 +337,7 @@
 									祝日更新
 								</h5>
 
-								<button type="button"
-									class="btn-close"
-									data-bs-dismiss="modal"
-									aria-label="閉じる">
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる">
 								</button>
 
 							</div>
@@ -394,14 +359,11 @@
 											<!-- 日付 -->
 											<div class="col-md-4">
 
-												<label for="updateYyyymmdd"
-													class="form-label">
+												<label for="updateYyyymmdd" class="form-label">
 													日付:
 												</label>
 
-												<input type="date"
-													id="updateYyyymmdd"
-													name="yyyymmdd"
+												<input type="date" id="updateYyyymmdd" name="yyyymmdd"
 													class="form-control">
 
 												<div class="invalid-feedback">
@@ -414,14 +376,11 @@
 											<!-- 祝日名 -->
 											<div class="col-md-4">
 
-												<label for="updateHolidayName"
-													class="form-label">
+												<label for="updateHolidayName" class="form-label">
 													祝日名:
 												</label>
 
-												<input type="text"
-													id="updateHolidayName"
-													name="holidayName"
+												<input type="text" id="updateHolidayName" name="holidayName"
 													class="form-control">
 
 												<div class="invalid-feedback">
@@ -442,15 +401,11 @@
 							<!-- フッター -->
 							<div class="modal-footer py-3">
 
-								<button type="button"
-									class="btn btn-secondary"
-									data-bs-dismiss="modal">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
 									キャンセル
 								</button>
 
-								<button type="button"
-									class="btn btn-primary"
-									id="updateHolidayButton">
+								<button type="button" class="btn btn-primary" id="updateHolidayButton">
 									更新
 								</button>
 
@@ -465,35 +420,24 @@
 			</div>
 
 
-			<!-- ============================= -->
+
 			<!-- 削除モーダル -->
-			<!-- ============================= -->
-			<div class="modal fade"
-				id="deleteModal"
-				tabindex="-1"
-				aria-hidden="true">
+
+			<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
 
 				<div class="modal-dialog">
 
 					<div class="modal-content">
 
-						<form th:action="@{/holiday/delete}"
-							method="post"
-							id="deleteHolidayForm">
+						<form th:action="@{/holiday/delete}" method="post" id="deleteHolidayForm">
 
 							<!-- 削除対象ID -->
-							<input type="hidden"
-								id="deleteId"
-								name="id">
+							<input type="hidden" id="deleteId" name="id">
 
 							<!-- 削除後の再検索用 -->
-							<input type="hidden"
-								name="searchYyyymmdd"
-								th:value="${holidaySearchForm.yyyymmdd}">
+							<input type="hidden" name="searchYyyymmdd" th:value="${holidaySearchForm.yyyymmdd}">
 
-							<input type="hidden"
-								name="searchHolidayName"
-								th:value="${holidaySearchForm.holidayName}">
+							<input type="hidden" name="searchHolidayName" th:value="${holidaySearchForm.holidayName}">
 
 
 							<!-- ヘッダー -->
@@ -503,10 +447,7 @@
 									祝日削除
 								</h5>
 
-								<button type="button"
-									class="btn-close"
-									data-bs-dismiss="modal"
-									aria-label="閉じる">
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる">
 								</button>
 
 							</div>
@@ -525,14 +466,11 @@
 							<!-- フッター -->
 							<div class="modal-footer py-3">
 
-								<button type="button"
-									class="btn btn-secondary"
-									data-bs-dismiss="modal">
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
 									キャンセル
 								</button>
 
-								<button type="submit"
-									class="btn btn-danger">
+								<button type="submit" class="btn btn-danger">
 									削除
 								</button>
 
@@ -551,9 +489,9 @@
 	</div>
 
 
-	<!-- ============================= -->
+
 	<!-- 画面固有JavaScript -->
-	<!-- ============================= -->
+
 	<th:block layout:fragment="script">
 
 		<script>
@@ -571,9 +509,9 @@
 					document.getElementById("deleteButton");
 
 
-				// =============================
+
 				// 一覧選択
-				// =============================
+
 
 				radioButtons.forEach(function (radio) {
 
@@ -605,9 +543,9 @@
 				});
 
 
-				// =============================
+
 				// 新規登録
-				// =============================
+
 
 				const createButton =
 					document.getElementById(
@@ -686,9 +624,8 @@
 				);
 
 
-				// =============================
 				// 更新モーダル表示
-				// =============================
+
 
 				updateButton.addEventListener(
 					"click",
@@ -743,9 +680,9 @@
 				);
 
 
-				// =============================
+
 				// 更新処理
-				// =============================
+
 
 				const updateHolidayButton =
 					document.getElementById(
@@ -825,9 +762,9 @@
 				);
 
 
-				// =============================
+
 				// 削除モーダル表示
-				// =============================
+
 
 				deleteButton.addEventListener(
 					"click",

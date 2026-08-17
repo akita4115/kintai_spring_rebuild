@@ -41,6 +41,10 @@ public class SecurityConfig {
 				// 勤怠管理画面は管理者のみ
 				.requestMatchers("/attendance/manage/**")
 				.hasRole("ADMIN")
+				
+				//祝日マスタ管理は管理者のみ
+				.requestMatchers("/holiday/**")
+				.hasRole("ADMIN")
 
 				// その他はログイン必須
 				.anyRequest().authenticated());
