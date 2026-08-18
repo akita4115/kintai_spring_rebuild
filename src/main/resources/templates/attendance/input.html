@@ -11,7 +11,18 @@
 
 <body>
 
-	<h2>勤怠入力画面</h2>
+	<div layout:fragment="content">
+
+		<!-- Reactの画面を表示する場所 -->
+		<div id="root"></div>
+
+		<!-- Reactのビルドファイル -->
+		<script
+			type="module"
+			th:src="@{/assets/bundle.js}">
+		</script>
+
+	</div>
 
 </body>
 
