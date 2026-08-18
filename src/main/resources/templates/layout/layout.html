@@ -43,18 +43,19 @@
 				<ul class="navbar-nav me-auto">
 
 
-				
+
 					<!-- 管理ユーザのみ表示 -->
-			
+
 					<th:block sec:authorize="hasRole('ADMIN')">
 
 						<!-- 勤怠管理 -->
 						<li class="nav-item">
 
-							<a class="nav-link"
-								th:classappend="${activePage == 'kintaiManage'} ? ' active fw-bold' : ''"
-								th:href="@{/kintai/manage}">
-								勤怠管理
+							<a th:class="${activePage == 'attendanceManage'}
+									? 'nav-link active fw-bold'
+									: 'nav-link'" 
+									th:href="@{/attendance/manage}">
+									勤怠管理
 							</a>
 
 						</li>
@@ -64,21 +65,19 @@
 
 					<!-- 勤怠入力 -->
 					<!-- 一般・管理ユーザ共通 -->
-				
-					<li class="nav-item">
 
-						<a class="nav-link" th:classappend="${activePage == 'kintaiInput'} ? ' active fw-bold' : ''"
-							th:href="@{/}">
+					<a th:class="${activePage == 'attendanceInput'}
+							? 'nav-link active fw-bold'
+							: 'nav-link'" 
+							th:href="@{/attendance/input}">
 							勤怠入力
-						</a>
-
-					</li>
+					</a>
 
 
-					
+
 					<!-- マスタ管理 -->
 					<!-- 管理ユーザのみ表示 -->
-					
+
 					<th:block sec:authorize="hasRole('ADMIN')">
 
 						<li class="nav-item dropdown">
@@ -117,10 +116,10 @@
 					</th:block>
 
 
-					
+
 					<!-- ログアウト -->
 					<!-- 一般・管理ユーザ共通 -->
-					
+
 					<li class="nav-item">
 
 						<form th:action="@{/logout}" method="post" class="m-0">
