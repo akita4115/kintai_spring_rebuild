@@ -56,6 +56,23 @@
 
 	</select>
 
+	<!-- 指定期間の祝日一覧取得 -->
+	<select id="findByPeriod"
+		resultType="com.example.demo.domain.model.Holiday">
+
+		SELECT
+			id,
+			yyyymmdd,
+			holiday_name
+		FROM
+			holidays
+		WHERE
+			yyyymmdd BETWEEN #{startDate} AND #{endDate}
+		ORDER BY
+			yyyymmdd
+
+	</select>
+
 	<!-- IDで1件取得 -->
 	<select id="findOne"
 		resultType="com.example.demo.domain.model.Holiday">
