@@ -254,14 +254,15 @@
 												</label>
 
 												<input type="date" id="createYyyymmdd" class="form-control"
+													th:classappend="${#fields.hasErrors('yyyymmdd')} ? 'is-invalid'"
 													th:field="*{yyyymmdd}">
 
-												<div class="invalid-feedback">
-													必須入力です。
+												<div class="invalid-feedback" th:text="${#fields.hasErrors('yyyymmdd')
+													? #fields.errors('yyyymmdd')[0]
+													: '必須入力です。'}">
 												</div>
 
 											</div>
-
 
 											<!-- 祝日名 -->
 											<div class="col-md-4">
@@ -271,22 +272,22 @@
 												</label>
 
 												<input type="text" id="createHolidayName" class="form-control"
+													th:classappend="${#fields.hasErrors('holidayName')} ? 'is-invalid'"
 													th:field="*{holidayName}">
 
-												<div class="invalid-feedback">
-													必須入力です。
+												<div class="invalid-feedback" th:text="${#fields.hasErrors('holidayName')
+													? #fields.errors('holidayName')[0]
+													: '必須入力です。'}">
 												</div>
 
 											</div>
 
 										</div>
-
 									</div>
 
 								</div>
 
 							</div>
-
 
 							<!-- フッター -->
 							<div class="modal-footer py-3">
@@ -310,16 +311,15 @@
 			</div>
 
 
-
 			<!-- 更新モーダル -->
-
 			<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
 
 				<div class="modal-dialog modal-lg">
 
 					<div class="modal-content">
 
-						<form th:action="@{/holiday/update}" method="post" id="updateHolidayForm">
+						<form th:action="@{/holiday/update}" th:object="${holidayUpdateForm}" method="post"
+							id="updateHolidayForm">
 
 							<!-- 更新後の再検索用 -->
 							<input type="hidden" name="searchYyyymmdd" th:value="${holidaySearchForm.yyyymmdd}">
@@ -327,8 +327,7 @@
 							<input type="hidden" name="searchHolidayName" th:value="${holidaySearchForm.holidayName}">
 
 							<!-- 更新対象ID -->
-							<input type="hidden" id="updateId" name="id">
-
+							<input type="hidden" id="updateId" th:field="*{id}">
 
 							<!-- ヘッダー -->
 							<div class="modal-header bg-info text-white">
@@ -341,7 +340,6 @@
 								</button>
 
 							</div>
-
 
 							<!-- モーダル本文 -->
 							<div class="modal-body p-4">
@@ -363,15 +361,16 @@
 													日付:
 												</label>
 
-												<input type="date" id="updateYyyymmdd" name="yyyymmdd"
-													class="form-control">
+												<input type="date" id="updateYyyymmdd" class="form-control"
+													th:classappend="${#fields.hasErrors('yyyymmdd')} ? 'is-invalid'"
+													th:field="*{yyyymmdd}">
 
-												<div class="invalid-feedback">
-													必須入力です。
+												<div class="invalid-feedback" th:text="${#fields.hasErrors('yyyymmdd')
+													? #fields.errors('yyyymmdd')[0]
+													: '必須入力です。'}">
 												</div>
 
 											</div>
-
 
 											<!-- 祝日名 -->
 											<div class="col-md-4">
@@ -380,13 +379,14 @@
 													祝日名:
 												</label>
 
-												<input type="text" id="updateHolidayName" name="holidayName"
-													class="form-control">
+												<input type="text" id="updateHolidayName" class="form-control"
+													th:classappend="${#fields.hasErrors('holidayName')} ? 'is-invalid'"
+													th:field="*{holidayName}">
 
-												<div class="invalid-feedback">
-													必須入力です。
+												<div class="invalid-feedback" th:text="${#fields.hasErrors('holidayName')
+													? #fields.errors('holidayName')[0]
+													: '必須入力です。'}">
 												</div>
-
 											</div>
 
 										</div>
@@ -396,7 +396,6 @@
 								</div>
 
 							</div>
-
 
 							<!-- フッター -->
 							<div class="modal-footer py-3">
@@ -420,84 +419,43 @@
 			</div>
 
 
+			<!-- 画面固有JavaScript -->
 
-			<!-- 削除モーダル -->
+			<th:block layout:fragment="script">
 
-			<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+				<script th:src="@{/js/holiday.js}"></script>
 
-				<div class="modal-dialog">
+				<script th:if="${openUpdateModal}">
+					document.addEventListener("DOMContentLoaded", function () {
 
-					<div class="modal-content">
+						const updateModalElement =
+							document.getElementById("updateModal");
 
-						<form th:action="@{/holiday/delete}" method="post" id="deleteHolidayForm">
+						const updateModal =
+							bootstrap.Modal.getOrCreateInstance(
+								updateModalElement
+							);
 
-							<!-- 削除対象ID -->
-							<input type="hidden" id="deleteId" name="id">
+						updateModal.show();
+					});
+				</script>
 
-							<!-- 削除後の再検索用 -->
-							<input type="hidden" name="searchYyyymmdd" th:value="${holidaySearchForm.yyyymmdd}">
+				<script th:if="${openCreateModal}">
+					document.addEventListener("DOMContentLoaded", function () {
 
-							<input type="hidden" name="searchHolidayName" th:value="${holidaySearchForm.holidayName}">
+						const createModalElement =
+							document.getElementById("createModal");
 
+						const createModal =
+							bootstrap.Modal.getOrCreateInstance(
+								createModalElement
+							);
 
-							<!-- ヘッダー -->
-							<div class="modal-header bg-info text-white">
+						createModal.show();
+					});
+				</script>
 
-								<h5 class="modal-title fw-bold">
-									祝日削除
-								</h5>
-
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる">
-								</button>
-
-							</div>
-
-
-							<!-- 本文 -->
-							<div class="modal-body py-4">
-
-								<p class="mb-0">
-									選択した祝日を削除しますか？
-								</p>
-
-							</div>
-
-
-							<!-- フッター -->
-							<div class="modal-footer py-3">
-
-								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-									キャンセル
-								</button>
-
-								<button type="submit" class="btn btn-danger">
-									削除
-								</button>
-
-							</div>
-
-						</form>
-
-					</div>
-
-				</div>
-
-			</div>
-
-		</div>
-
-	</div>
-
-
-
-	<!-- 画面固有JavaScript -->
-
-	<th:block layout:fragment="script">
-
-		<script th:src="@{/js/holiday.js}"></script>
-
-	</th:block>
-
+			</th:block>
 </body>
 
 </html>

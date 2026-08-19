@@ -18,6 +18,7 @@ import com.example.demo.domain.model.Holiday;
 import com.example.demo.domain.service.HolidayService;
 import com.example.demo.form.HolidayDetailForm;
 import com.example.demo.form.HolidaySearchForm;
+import com.example.demo.form.HolidayUpdateForm;
 
 import jakarta.validation.Valid;
 
@@ -41,25 +42,22 @@ public class HolidayController {
 
 		// 検索結果の件数を取得
 		int totalCount = holidayService.getHolidayCount(holidaySearchForm);
-		
+
 		//総ページ数を計算
 		int totalPages = (int) Math.ceil((double) totalCount / holidaySearchForm.getPageSize());
-		
-		
-		
 
 		// 取得した祝日一覧を画面へ渡す
 		model.addAttribute("holidayList", holidayList);
 
 		// 検索結果件数を画面へ渡す
 		model.addAttribute("totalCount", totalCount);
-		
+
 		//総ページ数を画面へ渡す
 		model.addAttribute("totalPages", totalPages);
 
 		// 検索条件を画面へ渡す
 		model.addAttribute("holidaySearchForm", holidaySearchForm);
-		
+
 		// メニューバーの祝日マスタ管理をアクティブ表示
 		model.addAttribute("activePage", "holiday");
 
@@ -70,8 +68,15 @@ public class HolidayController {
 					"holidayDetailForm",
 					new HolidayDetailForm());
 		}
+		// 更新フォーム
+		if (!model.containsAttribute("holidayUpdateForm")) {
 
+			model.addAttribute(
+					"holidayUpdateForm",
+					new HolidayUpdateForm());
+		}
 		return "holiday/index";
+
 	}
 
 	/**
@@ -115,6 +120,11 @@ public class HolidayController {
 					"openCreateModal",
 					true);
 
+			// 更新フォーム
+			model.addAttribute(
+					"holidayUpdateForm",
+					new HolidayUpdateForm());
+			
 			return "holiday/index";
 		}
 
@@ -145,23 +155,81 @@ public class HolidayController {
 	 */
 	@PostMapping("/update")
 	public String postUpdate(
-			@RequestParam Long id,
-			@RequestParam String yyyymmdd,
-			@RequestParam String holidayName,
+			@ModelAttribute("holidayUpdateForm") @Valid HolidayUpdateForm holidayUpdateForm,
+			BindingResult bindingResult,
 			@RequestParam(required = false) String searchYyyymmdd,
 			@RequestParam(required = false) String searchHolidayName,
+			Model model,
 			RedirectAttributes redirectAttributes) {
 
-		// 更新対象を作成
+		// 入力チェックエラー
+		if (bindingResult.hasErrors()) {
+
+			HolidaySearchForm holidaySearchForm = new HolidaySearchForm();
+
+			holidaySearchForm.setYyyymmdd(
+					searchYyyymmdd);
+
+			holidaySearchForm.setHolidayName(
+					searchHolidayName);
+
+			// 検索条件で一覧を再取得
+			List<Holiday> holidayList = holidayService.getHolidayList(
+					holidaySearchForm);
+
+			int totalCount = holidayService.getHolidayCount(
+					holidaySearchForm);
+
+			int totalPages = (int) Math.ceil(
+					(double) totalCount
+							/ holidaySearchForm.getPageSize());
+
+			model.addAttribute(
+					"holidayList",
+					holidayList);
+
+			model.addAttribute(
+					"totalCount",
+					totalCount);
+
+			model.addAttribute(
+					"totalPages",
+					totalPages);
+
+			model.addAttribute(
+					"holidaySearchForm",
+					holidaySearchForm);
+
+			// 新規登録フォーム
+			model.addAttribute(
+					"holidayDetailForm",
+					new HolidayDetailForm());
+
+			// 更新モーダルを再表示
+			model.addAttribute(
+					"openUpdateModal",
+					true);
+
+			// メニューバーをアクティブ表示
+			model.addAttribute(
+					"activePage",
+					"holiday");
+
+			return "holiday/index";
+		}
+
+		// FormからHolidayへ詰め替え
 		Holiday holiday = new Holiday();
 
-		holiday.setId(id);
+		holiday.setId(
+				holidayUpdateForm.getId());
 
 		holiday.setYyyymmdd(
-				LocalDate.parse(yyyymmdd));
+				LocalDate.parse(
+						holidayUpdateForm.getYyyymmdd()));
 
 		holiday.setHolidayName(
-				holidayName);
+				holidayUpdateForm.getHolidayName());
 
 		// 更新
 		holidayService.updateHoliday(holiday);

@@ -16,12 +16,12 @@ public class LoginUserUpdateForm {
 	//社員番号
 	@NotBlank(message = "{require_check}")
 	@Pattern(regexp = "^$|^[0-9]+$", message = "{user_no_format}")
-	@Size(max = 10)
+	@Size(max = 10, message = "{user_no_size}")
 	private String userNo;
 
 	//社員名
 	@NotBlank(message = "{require_check}")
-	@Size(max = 255)
+	@Size(max = 255, message = "{user_name_size}")
 	private String name;
 
 	//入社日
@@ -29,6 +29,7 @@ public class LoginUserUpdateForm {
 	private String startDate;
 
 	//パスワード（入力時のみ）
+	@Size(max = 255, message = "{password_size}")
 	private String password;
 
 	//確認用パスワード

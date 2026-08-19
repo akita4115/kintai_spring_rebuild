@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
 
 	const radioButtons =
 		document.querySelectorAll(
@@ -13,11 +13,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 	// 一覧選択
-	radioButtons.forEach(function (radio) {
+	radioButtons.forEach(function(radio) {
 
 		radio.addEventListener(
 			"change",
-			function () {
+			function() {
 
 				updateButton.disabled = false;
 				deleteButton.disabled = false;
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		// 行をクリックしてもラジオボタンを選択
 		radio.closest("tr").addEventListener(
 			"click",
-			function () {
+			function() {
 
 				radio.checked = true;
 
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	createButton.addEventListener(
 		"click",
-		function () {
+		function() {
 
 			let hasError = false;
 
@@ -93,6 +93,10 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 
 
+			// 祝日名のエラー表示
+			const createHolidayNameError =
+				createHolidayName.nextElementSibling;
+
 			// 祝日名必須チェック
 			if (
 				createHolidayName.value.trim()
@@ -103,8 +107,24 @@ document.addEventListener("DOMContentLoaded", function () {
 					"is-invalid"
 				);
 
+				createHolidayNameError.textContent =
+					"必須入力です。";
+
 				hasError = true;
 
+				// 祝日名文字数チェック
+			} else if (
+				createHolidayName.value.length > 10
+			) {
+
+				createHolidayName.classList.add(
+					"is-invalid"
+				);
+
+				createHolidayNameError.textContent =
+					"祝日名は10文字以内で入力してください。";
+
+				hasError = true;
 			}
 
 
@@ -117,14 +137,14 @@ document.addEventListener("DOMContentLoaded", function () {
 			// 正常の場合のみ登録
 			createForm.submit();
 
-		}
-	);
+					}
+			);
 
 
-	// 更新モーダル表示
-	updateButton.addEventListener(
-		"click",
-		function () {
+			// 更新モーダル表示
+			updateButton.addEventListener(
+				"click",
+				function() {
 
 			const selectedHoliday =
 				document.querySelector(
@@ -199,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	updateHolidayButton.addEventListener(
 		"click",
-		function () {
+		function() {
 
 			let hasError = false;
 
@@ -226,6 +246,10 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 
 
+			// 祝日名のエラー表示
+			const updateHolidayNameError =
+				updateHolidayName.nextElementSibling;
+
 			// 祝日名必須チェック
 			if (
 				updateHolidayName.value.trim()
@@ -236,8 +260,24 @@ document.addEventListener("DOMContentLoaded", function () {
 					"is-invalid"
 				);
 
+				updateHolidayNameError.textContent =
+					"必須入力です。";
+
 				hasError = true;
 
+				// 祝日名文字数チェック
+			} else if (
+				updateHolidayName.value.length > 10
+			) {
+
+				updateHolidayName.classList.add(
+					"is-invalid"
+				);
+
+				updateHolidayNameError.textContent =
+					"祝日名は10文字以内で入力してください。";
+
+				hasError = true;
 			}
 
 
@@ -257,7 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	// 削除モーダル表示
 	deleteButton.addEventListener(
 		"click",
-		function () {
+		function() {
 
 			const selectedHoliday =
 				document.querySelector(
