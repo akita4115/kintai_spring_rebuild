@@ -90,12 +90,16 @@ public class AttendanceInputServiceImpl
 
 			boolean isHoliday =
 					holidayMap.containsKey(date);
+			
+			detail.setHoliday(isHoliday);
 
 			// 土曜日・日曜日・祝日
 			if (isSaturday
 					|| isSunday
 					|| isHoliday) {
 
+				detail.setAttendanceType("休日");
+				detail.setKbn("2");
 				detail.setAttendanceType("休日");
 				detail.setStartTime("");
 				detail.setEndTime("");
@@ -106,6 +110,8 @@ public class AttendanceInputServiceImpl
 
 			} else {
 				// 平日
+				detail.setAttendanceType("出勤");
+				detail.setKbn("1");
 				detail.setAttendanceType("出勤");
 				detail.setStartTime("09:00");
 				detail.setEndTime("18:00");

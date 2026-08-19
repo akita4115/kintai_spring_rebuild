@@ -86,53 +86,208 @@ const AttendanceInput = () => {
 	};
 
 	/**
-	 * 勤怠一覧の入力内容を変更
+	 * HH:mmを分へ変換
 	 */
+	const timeToMinutes = (time) => {
+
+		const [hours, minutes] =
+			time.split(":").map(Number);
+
+			return hours * 60 + minutes;
+	};
+
+	/**
+	 * 分をHH:mmへ変換
+	 */
+	const minutesToTime = (totalMinutes) => {
+
+		const hours =
+		Math.floor(totalMinutes / 60);
+
+		const minutes = 
+			totalMinutes % 60;
+	
+		return `${String(hours).padStart(2, "0")}:${String(
+			minutes
+		).padStart(2, "0")}`;
+	};
+
+	/**
+ * 勤務時間・残業時間を計算
+ */
+const calculateWorkingHours = (attendance) => {
+
+	const calculatedAttendance = {
+		...attendance,
+	};
+
+	const {
+		startTime,
+		endTime,
+		breakTime,
+		nightBreakTime,
+	} = calculatedAttendance;
+
+	// 必要な時刻が未入力の場合
+	if (
+		!startTime
+		|| !endTime
+		|| !breakTime
+		|| !nightBreakTime
+	) {
+		calculatedAttendance.workTime = "";
+		calculatedAttendance.overTime = "";
+
+		return calculatedAttendance;
+	}
+
+	const startMinutes =
+		timeToMinutes(startTime);
+
+	let endMinutes =
+		timeToMinutes(endTime);
+
+	// 終了時刻が開始時刻より前の場合は翌日として計算
+	if (endMinutes < startMinutes) {
+		endMinutes += 24 * 60;
+	}
+
+	const breakMinutes =
+		timeToMinutes(breakTime);
+
+	const nightBreakMinutes =
+		timeToMinutes(nightBreakTime);
+
+	// 終了－開始－昼休憩－夜休憩
+	const workMinutes = Math.max(
+		0,
+		endMinutes
+			- startMinutes
+			- breakMinutes
+			- nightBreakMinutes
+	);
+
+	// 8時間を超えた分は残業
+	const overMinutes = Math.max(
+		0,
+		workMinutes - 8 * 60
+	);
+
+	calculatedAttendance.workTime =
+		minutesToTime(workMinutes);
+
+	calculatedAttendance.overTime =
+		minutesToTime(overMinutes);
+
+	return calculatedAttendance;
+};
+	/**
+	* 勤怠一覧の入力内容を変更
+　	*/
 	const handleAttendanceChange = (
 		index,
 		field,
 		value
 	) => {
 
-		const updatedList = [...attendanceList];
+	// 変更前の勤怠情報
+	const previousAttendance =
+		attendanceList[index];
 
-		updatedList[index] = {
-			...updatedList[index],
-			[field]: value,
+	// 一覧をコピー
+	const updatedList = [...attendanceList];
+
+	// 変更された値を設定
+	updatedList[index] = {
+		...updatedList[index],
+		[field]: value,
+	};
+
+	// 区分を変更した場合
+	if (field === "kbn") {
+
+		const kbnNames = {
+			"1": "出勤",
+			"2": "休日",
+			"3": "有給",
+			"4": "休出",
+			"5": "欠勤",
+			"6": "特休",
+			"7": "代休",
+			"8": "振休",
 		};
 
-		// 区分を変更した場合
-		if (field === "attendanceType") {
+		updatedList[index].attendanceType =
+			kbnNames[value];
 
-			if (value === "休日") {
-				updatedList[index].startTime = "";
-				updatedList[index].endTime = "";
-				updatedList[index].breakTime = "";
-				updatedList[index].nightBreakTime = "";
-				updatedList[index].workTime = "";
-				updatedList[index].overTime = "";
+		// 時刻を入力する勤務扱い区分
+		const workKbnList = ["1", "4"];
 
-			} else if (value === "出勤") {
-				updatedList[index].startTime = "09:00";
-				updatedList[index].endTime = "18:00";
-				updatedList[index].breakTime = "01:00";
-				updatedList[index].nightBreakTime = "00:00";
-			}
+		const wasWork =
+			workKbnList.includes(
+				previousAttendance.kbn
+			);
+
+		const isWork =
+			workKbnList.includes(value);
+
+		// 休日扱いから勤務扱いへ変更
+		if (!wasWork && isWork) {
+
+			updatedList[index].startTime = "09:00";
+			updatedList[index].endTime = "18:00";
+			updatedList[index].breakTime = "01:00";
+			updatedList[index].nightBreakTime = "00:00";
+			updatedList[index].workTime = "08:00";
+			updatedList[index].overTime = "00:00";
 		}
 
+		// 勤務扱いから休日扱いへ変更
+		if (wasWork && !isWork) {
+
+			updatedList[index].startTime = "";
+			updatedList[index].endTime = "";
+			updatedList[index].breakTime = "";
+			updatedList[index].nightBreakTime = "";
+			updatedList[index].workTime = "";
+			updatedList[index].overTime = "";
+		}
+
+		
+	}
+		// 時刻を変更した場合は勤務時間・残業時間を再計算
+		const timeFieldList = [
+			"startTime",
+			"endTime",
+			"breakTime",
+			"nightBreakTime",
+		];
+
+		if (timeFieldList.includes(field)) {
+
+			updatedList[index] =
+				calculateWorkingHours(
+					updatedList[index]
+				);
+		}
 		setAttendanceList(updatedList);
 	};
 
 	/**
 	 * 曜日による行の色
 	 */
-	const getRowClassName = (dayOfWeek) => {
+	const getRowClassName = (attendance) => {
 
-		if (dayOfWeek === "土") {
+		if(attendance.holiday) {
+			return "table-danger";
+		}
+
+
+		if (attendance.dayOfWeek === "土") {
 			return "table-info";
 		}
 
-		if (dayOfWeek === "日") {
+		if (attendance.dayOfWeek === "日") {
 			return "table-danger";
 		}
 
@@ -263,9 +418,7 @@ const AttendanceInput = () => {
 												attendance.attendanceDate
 											}
 											className={
-												getRowClassName(
-													attendance.dayOfWeek
-												)
+												getRowClassName(attendance)
 											}
 										>
 
@@ -286,25 +439,23 @@ const AttendanceInput = () => {
 											<td>
 												<select
 													className="form-select"
-													value={
-														attendance
-															.attendanceType
-													}
+													value={attendance.kbn}
 													onChange={(event) =>
 														handleAttendanceChange(
 															index,
-															"attendanceType",
+															"kbn",
 															event.target.value
 														)
 													}
 												>
-													<option value="出勤">
-														出勤
-													</option>
-
-													<option value="休日">
-														休日
-													</option>
+													<option value="1">出勤</option>
+													<option value="2">休日</option>
+													<option value="3">有給</option>
+													<option value="4">休出</option>
+													<option value="5">欠勤</option>
+													<option value="6">特休</option>
+													<option value="7">代休</option>
+													<option value="8">振休</option>
 												</select>
 											</td>
 

@@ -19,6 +19,9 @@ public class AttendanceInputDetail {
 	//区分
 	private String attendanceType;
 	
+	//勤怠区分コード
+	private String kbn;
+	
 	//開始時刻
 	private String startTime;
 	
@@ -39,6 +42,9 @@ public class AttendanceInputDetail {
 	
 	//備考
 	private String remarks;
+	
+	//日祝判断
+	private boolean holiday;
 		
 	
 }
