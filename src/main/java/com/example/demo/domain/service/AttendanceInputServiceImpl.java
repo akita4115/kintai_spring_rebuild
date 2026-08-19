@@ -98,7 +98,6 @@ public class AttendanceInputServiceImpl
 					|| isSunday
 					|| isHoliday) {
 
-				detail.setAttendanceType("休日");
 				detail.setKbn("2");
 				detail.setAttendanceType("休日");
 				detail.setStartTime("");
@@ -110,7 +109,6 @@ public class AttendanceInputServiceImpl
 
 			} else {
 				// 平日
-				detail.setAttendanceType("出勤");
 				detail.setKbn("1");
 				detail.setAttendanceType("出勤");
 				detail.setStartTime("09:00");
