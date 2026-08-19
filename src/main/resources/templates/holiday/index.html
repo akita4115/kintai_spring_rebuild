@@ -310,6 +310,59 @@
 
 			</div>
 
+			<!-- 削除モーダル -->
+			<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+
+				<div class="modal-dialog">
+
+					<div class="modal-content">
+
+						<form th:action="@{/holiday/delete}" method="post" id="deleteHolidayForm">
+
+							<input type="hidden" id="deleteId" name="id">
+
+							<input type="hidden" name="searchYyyymmdd" th:value="${holidaySearchForm.yyyymmdd}">
+
+							<input type="hidden" name="searchHolidayName" th:value="${holidaySearchForm.holidayName}">
+
+							<div class="modal-header bg-info text-white">
+
+								<h5 class="modal-title fw-bold">
+									祝日削除
+								</h5>
+
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる">
+								</button>
+
+							</div>
+
+							<div class="modal-body py-4">
+
+								<p class="mb-0">
+									選択した祝日を削除しますか？
+								</p>
+
+							</div>
+
+							<div class="modal-footer py-3">
+
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+									キャンセル
+								</button>
+
+								<button type="submit" class="btn btn-danger">
+									削除
+								</button>
+
+							</div>
+
+						</form>
+
+					</div>
+
+				</div>
+
+			</div>
 
 			<!-- 更新モーダル -->
 			<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
@@ -417,45 +470,46 @@
 				</div>
 
 			</div>
+		</div>
+	</div>
 
+	<!-- 画面固有JavaScript -->
 
-			<!-- 画面固有JavaScript -->
+	<th:block layout:fragment="script">
 
-			<th:block layout:fragment="script">
+		<script th:src="@{/js/holiday.js}"></script>
 
-				<script th:src="@{/js/holiday.js}"></script>
+		<script th:if="${openUpdateModal}">
+			document.addEventListener("DOMContentLoaded", function () {
 
-				<script th:if="${openUpdateModal}">
-					document.addEventListener("DOMContentLoaded", function () {
+				const updateModalElement =
+					document.getElementById("updateModal");
 
-						const updateModalElement =
-							document.getElementById("updateModal");
+				const updateModal =
+					bootstrap.Modal.getOrCreateInstance(
+						updateModalElement
+					);
 
-						const updateModal =
-							bootstrap.Modal.getOrCreateInstance(
-								updateModalElement
-							);
+				updateModal.show();
+			});
+		</script>
 
-						updateModal.show();
-					});
-				</script>
+		<script th:if="${openCreateModal}">
+			document.addEventListener("DOMContentLoaded", function () {
 
-				<script th:if="${openCreateModal}">
-					document.addEventListener("DOMContentLoaded", function () {
+				const createModalElement =
+					document.getElementById("createModal");
 
-						const createModalElement =
-							document.getElementById("createModal");
+				const createModal =
+					bootstrap.Modal.getOrCreateInstance(
+						createModalElement
+					);
 
-						const createModal =
-							bootstrap.Modal.getOrCreateInstance(
-								createModalElement
-							);
+				createModal.show();
+			});
+		</script>
 
-						createModal.show();
-					});
-				</script>
-
-			</th:block>
+	</th:block>
 </body>
 
 </html>
