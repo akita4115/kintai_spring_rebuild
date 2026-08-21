@@ -33,7 +33,9 @@ public class AttendanceInputApiController {
 	 */
 	@GetMapping
 	public AttendanceInputEntity getAttendanceInput(
-			@RequestParam(required = false)
+			@RequestParam(
+					name = "targetMonth",
+					required = false)
 			String targetMonth) {
 
 		AttendanceInputEntity attendanceInputEntity =

@@ -559,7 +559,7 @@ const UserIndex = () => {
                           onChange={handleDetailChange}
                         >
                           <option value="0">一般</option>
-                          <option value="1">管理</option>
+                          <option value="1">管理者</option>
                         </select>
 
                         <div className="invalid-feedback">
