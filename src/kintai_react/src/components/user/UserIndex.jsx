@@ -388,7 +388,7 @@ const UserIndex = () => {
                     className={
                       selectedUser?.id === user.id ? "table-active" : ""
                     }
-                    style={{ cursor: "pointer" }}
+                    role="button"
                   >
                     <td>
                       <input
@@ -457,17 +457,12 @@ const UserIndex = () => {
 
       {/* 新規登録・更新モーダル */}
       {showModal && (
-        <div
-          className="modal d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
+        <div className="modal d-block bg-dark bg-opacity-50">
           <div className="modal-dialog modal-xl">
             <div className="modal-content">
               {/* モーダルヘッダー */}
-              <div
-                className="modal-header text-white"
-                style={{ backgroundColor: "#1ad8fa" }}            //スタイルは使わないbootstrapで
-              >
+              <div className="modal-header bg-info text-white">        
+
                 <h5 className="modal-title">
                   {modalMode === "update" ? "社員更新" : "社員登録"}
                 </h5>
@@ -669,16 +664,10 @@ const UserIndex = () => {
 
       {/* 削除確認モーダル */}
       {showDeleteModal && selectedUser && (
-        <div
-          className="modal d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
+        <div className="modal d-block bg-dark bg-opacity-50">
           <div className="modal-dialog modal-md">
             <div className="modal-content">
-              <div
-                className="modal-header text-white"
-                style={{ backgroundColor: "#1ad8fa" }}
-              >
+              <div className="modal-header bg-info text-white">
                 <h5 className="modal-title">社員削除</h5>
                 <button
                   type="button"

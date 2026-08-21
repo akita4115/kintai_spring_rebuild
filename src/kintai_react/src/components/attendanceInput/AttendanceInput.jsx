@@ -294,6 +294,8 @@ const calculateWorkingHours = (attendance) => {
 		return "";
 	};
 
+
+
 	return (
 		<div className="container mt-4">
 
@@ -385,11 +387,7 @@ const calculateWorkingHours = (attendance) => {
 					</div>
 
 					<div className="table-responsive">
-
-						<table
-							className="table table-bordered align-middle"
-							style={{ minWidth: "1250px" }}
-						>
+						<table className="table table-bordered align-middle">
 
 							<thead className="table-dark">
 
