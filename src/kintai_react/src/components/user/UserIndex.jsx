@@ -91,7 +91,6 @@ const UserIndex = () => {
   // クリアボタン押下時：検索条件を空にして再検索
   const handleClear = () => {
     setSearchForm(emptySearchForm);
-    searchUsers(1, emptySearchForm);
   };
 
   // ページ番号ボタン押下時
