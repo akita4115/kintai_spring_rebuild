@@ -163,7 +163,7 @@ const UserIndex = () => {
     setShowModal(true);
   };
 
-  // ==== 削除 ====
+  //  削除 
 
   // 削除確認モーダルの表示・非表示
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -305,7 +305,7 @@ const UserIndex = () => {
                 value={searchForm.roleCd}
                 onChange={handleChange}
               >
-                <option value="">すべて</option>
+                <option value=""></option>
                 <option value="0">一般</option>
                 <option value="1">管理者</option>
               </select>
@@ -466,7 +466,7 @@ const UserIndex = () => {
               {/* モーダルヘッダー */}
               <div
                 className="modal-header text-white"
-                style={{ backgroundColor: "#1ad8fa" }}
+                style={{ backgroundColor: "#1ad8fa" }}            //スタイルは使わないbootstrapで
               >
                 <h5 className="modal-title">
                   {modalMode === "update" ? "社員更新" : "社員登録"}

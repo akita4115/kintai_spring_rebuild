@@ -17,7 +17,7 @@ module.exports = defineConfig({
 		rollupOptions: {
 			input: path.resolve(
 				__dirname,
-				"src/index.jsx"
+				"src/main.jsx"
 			),
 
 			output: {
