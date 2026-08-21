@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import lombok.Data;
 
 @Data
-public class LoginUserSearchForm {
+public class UserSearchForm {
 
 	// 社員番号
 	private String userNo;

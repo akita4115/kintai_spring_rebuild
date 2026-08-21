@@ -7,14 +7,13 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class LoginUserDetailForm {
+public class UserDetailForm {
 
 	// Id
 	private Long id;
 
 	// 社員番号
 	@NotBlank(message = "{require_check}")
-	@Pattern(regexp = "^$|^[0-9]+$", message = "{user_no_format}")
 	@Size(max = 10, message = "{user_no_size}")
 	private String userNo;
 

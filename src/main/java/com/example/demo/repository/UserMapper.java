@@ -5,8 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.example.demo.domain.model.LoginUser;
-import com.example.demo.form.LoginUserSearchForm;
-
+import com.example.demo.form.UserSearchForm;
 @Mapper
 public interface UserMapper {
 
@@ -14,9 +13,9 @@ public interface UserMapper {
 
 	LoginUser findByEmail(String email);
 
-	List<LoginUser> findAll(LoginUserSearchForm form);
+	List<LoginUser> findAll(UserSearchForm form);
 
-	int countAll(LoginUserSearchForm form);
+	int countAll(UserSearchForm form);
 
 	int insertOne(LoginUser user);
 

@@ -24,9 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.domain.entity.UserEntity;
 import com.example.demo.domain.model.LoginUser;
 import com.example.demo.domain.service.UserService;
-import com.example.demo.form.LoginUserDetailForm;
-import com.example.demo.form.LoginUserSearchForm;
-import com.example.demo.form.LoginUserUpdateForm;
+import com.example.demo.form.UserDetailForm;
+import com.example.demo.form.UserSearchForm;
+import com.example.demo.form.UserUpdateForm;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +48,7 @@ public class UserApiController {
 	 */
 	@GetMapping
 	public UserEntity getUserList(
-			@ModelAttribute LoginUserSearchForm form) {
+			@ModelAttribute UserSearchForm form) {
 
 		try {
 			List<LoginUser> userList = userService.getUserList(form);
@@ -73,7 +73,7 @@ public class UserApiController {
 	 */
 	@PutMapping
 	public UserEntity create(
-			@RequestBody @Valid LoginUserDetailForm form,
+			@RequestBody @Valid UserDetailForm form,
 			BindingResult bindingResult,
 			Locale locale) {
 
@@ -154,7 +154,7 @@ public class UserApiController {
 	 */
 	@PatchMapping
 	public UserEntity update(
-			@RequestBody @Valid LoginUserUpdateForm form,
+			@RequestBody @Valid UserUpdateForm form,
 			BindingResult bindingResult,
 			Locale locale) {
 

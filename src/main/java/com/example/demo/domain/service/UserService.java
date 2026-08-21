@@ -7,7 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.domain.model.LoginUser;
-import com.example.demo.form.LoginUserSearchForm;
+import com.example.demo.form.UserSearchForm;
 import com.example.demo.repository.UserMapper;
 
 @Service
@@ -20,12 +20,12 @@ public class UserService {
 	private PasswordEncoder passwordEncoder;
 
 	// 社員一覧取得
-	public List<LoginUser> getUserList(LoginUserSearchForm form) {
+	public List<LoginUser> getUserList(UserSearchForm form) {
 		return userMapper.findAll(form);
 	}
 
 	// 検索条件に合致する総件数を取得
-	public int getUserCount(LoginUserSearchForm form) {
+	public int getUserCount(UserSearchForm form) {
 		return userMapper.countAll(form);
 	}
 

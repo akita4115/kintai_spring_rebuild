@@ -73,7 +73,7 @@
 	</sql>
 
 	<select id="findAll"
-		parameterType="com.example.demo.form.LoginUserSearchForm"
+		parameterType="com.example.demo.form.UserSearchForm"
 		resultType="com.example.demo.domain.model.LoginUser"> SELECT id,
 		user_no, name, email, start_date, role_cd, created_at, updated_at FROM
 		users <include refid="searchCondition" /> ORDER BY user_no LIMIT
@@ -81,7 +81,7 @@
 
 	<!-- 検索結果の総件数取得（ページング用） -->
 	<select id="countAll"
-		parameterType="com.example.demo.form.LoginUserSearchForm"
+		parameterType="com.example.demo.form.UserSearchForm"
 		resultType="int"> SELECT COUNT(*) FROM users <include
 			refid="searchCondition" />
 
