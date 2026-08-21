@@ -51,7 +51,7 @@
 	<sql id="searchCondition">
 		<where>
 			<if test="userNo != null and userNo != ''">
-				AND user_no LIKE CONCAT('%', #{userNo}, '%')
+				AND user_no LIKE CONCAT(#{userNo}, '%')
 			</if>
 
 			<if test="name != null and name != ''">
@@ -59,7 +59,7 @@
 			</if>
 
 			<if test="email != null and email != ''">
-				AND email LIKE CONCAT('%', #{email}, '%')
+				AND email LIKE CONCAT(#{email}, '%')
 			</if>
 
 			<if test="startDate != null">

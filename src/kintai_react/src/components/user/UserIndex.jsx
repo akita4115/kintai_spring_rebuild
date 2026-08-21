@@ -248,10 +248,10 @@ const UserIndex = () => {
     <div className="container mt-4">
       <h2 className="mb-3">社員マスタ管理</h2>
 
-      <div className="card page-card mb-4">
+      <div className="card page-card mb-4 ">
         <div className="card-header bg-light py-3 px-4">検索条件</div>
 
-        <div className="card-body">
+        <div className="card-body px-4">
           <div className="row g-3 align-items-end">
             <div className="col-md-2">
               <label className="form-label">社員番号:</label>
@@ -477,7 +477,7 @@ const UserIndex = () => {
               {/* モーダル本文 */}
               <div className="modal-body p-4">
                 <div className="border rounded">
-                  <div className="bg-light border-bottom px-3 py-2 fw-bold">
+                  <div className="bg-light border-bottom px-3 py-2">
                     社員情報
                   </div>
 
@@ -597,6 +597,7 @@ const UserIndex = () => {
                         </label>
 
                         <input
+                          type="password"
                           className={`form-control ${
                             formErrors.password || formErrors.confirmPassword
                               ? "is-invalid"
