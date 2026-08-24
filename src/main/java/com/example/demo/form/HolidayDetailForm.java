@@ -11,12 +11,11 @@ public class HolidayDetailForm {
 	private Integer id;
 
 	// 日付
-	@NotBlank(message = "{require_check}")
-	@Size(max = 20, message = "{holiday_date_size}")
+	@NotBlank(message = "{holiday_date_required}")
 	private String yyyymmdd;
 
 	// 祝日名
-	@NotBlank(message = "{require_check}")
-	@Size(max = 10,message = "{holiday_name_size}")
+	@NotBlank(message = "{holiday_name_required}")
+	@Size(max = 10, message = "{holiday_name_size}")
 	private String holidayName;
 }

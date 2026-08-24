@@ -81,12 +81,20 @@ document.addEventListener("DOMContentLoaded", function() {
 			);
 
 
+			//日付のエラー表示
+			const createYyyymmddError =
+				createYyyymmdd.nextElementSibling;
+
 			// 日付必須チェック
 			if (createYyyymmdd.value === "") {
 
 				createYyyymmdd.classList.add(
 					"is-invalid"
 				);
+				
+				createYyyymmddError.textContent = 
+					"日付を入力してください	。";
+				
 
 				hasError = true;
 
@@ -108,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				);
 
 				createHolidayNameError.textContent =
-					"必須入力です。";
+					"祝日名を入力してください。";
 
 				hasError = true;
 
@@ -234,12 +242,20 @@ document.addEventListener("DOMContentLoaded", function() {
 			);
 
 
+			//日付のエラー表示
+			const updateYyyymmddError = 
+				updateYyyymmdd.nextElementSibling;
+				
+
 			// 日付必須チェック
 			if (updateYyyymmdd.value === "") {
 
 				updateYyyymmdd.classList.add(
 					"is-invalid"
 				);
+				
+				updateYyyymmddError.textContent =
+					"日付を入力してください";
 
 				hasError = true;
 
@@ -261,7 +277,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				);
 
 				updateHolidayNameError.textContent =
-					"必須入力です。";
+					"祝日名を入力してください";
 
 				hasError = true;
 
