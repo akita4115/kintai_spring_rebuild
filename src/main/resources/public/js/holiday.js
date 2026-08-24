@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				);
 				
 				createYyyymmddError.textContent = 
-					"日付を入力してください	。";
+					"日付を入力してください。";
 				
 
 				hasError = true;
@@ -255,7 +255,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				);
 				
 				updateYyyymmddError.textContent =
-					"日付を入力してください";
+					"日付を入力してください。";
 
 				hasError = true;
 
@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				);
 
 				updateHolidayNameError.textContent =
-					"祝日名を入力してください";
+					"祝日名を入力してください。";
 
 				hasError = true;
 
