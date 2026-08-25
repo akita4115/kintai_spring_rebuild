@@ -21,7 +21,7 @@ public class UserController {
 		log.info("社員マスタ管理画面：開始");
 
 		// メニューバーの社員マスタ管理をアクティブ表示
-		model.addAttribute("activePage","user");
+		model.addAttribute("activePage", "user");
 
 		return "user/index";
 	}

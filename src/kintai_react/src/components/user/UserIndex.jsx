@@ -88,7 +88,7 @@ const UserIndex = () => {
     searchUsers(1);
   };
 
-  // クリアボタン押下時：検索条件を空にして再検索
+  // クリアボタン押下時：検索条件を空にする
   const handleClear = () => {
     setSearchForm(emptySearchForm);
   };
@@ -162,7 +162,7 @@ const UserIndex = () => {
     setShowModal(true);
   };
 
-  //  削除 
+  //  削除
 
   // 削除確認モーダルの表示・非表示
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -460,8 +460,7 @@ const UserIndex = () => {
           <div className="modal-dialog modal-xl">
             <div className="modal-content">
               {/* モーダルヘッダー */}
-              <div className="modal-header bg-info text-white">        
-
+              <div className="modal-header bg-info text-white">
                 <h5 className="modal-title">
                   {modalMode === "update" ? "社員更新" : "社員登録"}
                 </h5>

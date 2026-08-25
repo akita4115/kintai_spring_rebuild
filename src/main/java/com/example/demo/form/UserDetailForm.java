@@ -11,7 +11,7 @@ public class UserDetailForm {
 
 	// Id
 	private Long id;
-	
+
 	// 社員番号
 	@NotBlank(message = "{user_no_required}")
 	@Size(max = 10, message = "{user_no_size}")

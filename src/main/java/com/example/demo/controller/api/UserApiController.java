@@ -93,8 +93,7 @@ public class UserApiController {
 			// メールアドレス重複チェック
 			if (form.getEmail() != null && !form.getEmail().isBlank()) {
 
-				LoginUser registeredUser =
-						userService.findByEmail(form.getEmail());
+				LoginUser registeredUser = userService.findByEmail(form.getEmail());
 
 				if (registeredUser != null) {
 					bindingResult.rejectValue(
@@ -162,12 +161,10 @@ public class UserApiController {
 
 		try {
 			// パスワードまたは確認用パスワードが入力されている場合は一致チェック
-			boolean hasPassword =
-					form.getPassword() != null
+			boolean hasPassword = form.getPassword() != null
 					&& !form.getPassword().isEmpty();
 
-			boolean hasConfirmPassword =
-					form.getConfirmPassword() != null
+			boolean hasConfirmPassword = form.getConfirmPassword() != null
 					&& !form.getConfirmPassword().isEmpty();
 
 			if (hasPassword || hasConfirmPassword) {
@@ -180,7 +177,7 @@ public class UserApiController {
 							"confirmPassword",
 							null,
 							"パスワードと確認用パスワードが一致しません。");
-	
+
 				}
 			}
 
@@ -247,8 +244,7 @@ public class UserApiController {
 		} catch (Exception ex) {
 			log.error(ex.getMessage());
 
-			Map<String, String> errors =
-					new HashMap<>();
+			Map<String, String> errors = new HashMap<>();
 
 			errors.put(
 					"delete",
