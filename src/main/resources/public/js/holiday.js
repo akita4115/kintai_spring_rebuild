@@ -91,10 +91,10 @@ document.addEventListener("DOMContentLoaded", function() {
 				createYyyymmdd.classList.add(
 					"is-invalid"
 				);
-				
-				createYyyymmddError.textContent = 
+
+				createYyyymmddError.textContent =
 					"日付を入力してください。";
-				
+
 
 				hasError = true;
 
@@ -145,14 +145,14 @@ document.addEventListener("DOMContentLoaded", function() {
 			// 正常の場合のみ登録
 			createForm.submit();
 
-					}
-			);
+		}
+	);
 
 
-			// 更新モーダル表示
-			updateButton.addEventListener(
-				"click",
-				function() {
+	// 更新モーダル表示
+	updateButton.addEventListener(
+		"click",
+		function() {
 
 			const selectedHoliday =
 				document.querySelector(
@@ -243,9 +243,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 			//日付のエラー表示
-			const updateYyyymmddError = 
+			const updateYyyymmddError =
 				updateYyyymmdd.nextElementSibling;
-				
+
 
 			// 日付必須チェック
 			if (updateYyyymmdd.value === "") {
@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function() {
 				updateYyyymmdd.classList.add(
 					"is-invalid"
 				);
-				
+
 				updateYyyymmddError.textContent =
 					"日付を入力してください。";
 
@@ -348,5 +348,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
 		}
 	);
+
+	document.getElementById('clearSearchButton').addEventListener('click', function() {
+		document.getElementById('yyyymmdd').value = '';
+		document.getElementById('holidayName').value = '';
+	});
 
 });

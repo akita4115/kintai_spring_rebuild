@@ -56,9 +56,9 @@
 						<!-- 検索ボタン -->
 						<div class="d-flex justify-content-end">
 
-							<a th:href="@{/holiday/index}" class="btn btn-warning me-2">
-								クリア
-							</a>
+						<button type="button" class="btn btn-warning me-2" id="clearSearchButton">
+							クリア
+						</button>
 
 							<button type="submit" class="btn btn-info">
 								検索
@@ -128,7 +128,7 @@
 
 								</td>
 
-								<td th:text="${holiday.yyyymmdd}">
+								<td th:text="${#temporals.format(holiday.yyyymmdd, 'yyy/MM/dd')}">
 								</td>
 
 								<td th:text="${holiday.holidayName}">
@@ -139,6 +139,11 @@
 						</tbody>
 
 					</table>
+					
+					<!-- 検索結果なし -->
+					<div th:if="${#lists.isEmpty(holidayList)}" class="alert alert-warning">
+						検索結果がありませんでした。
+					</div>
 
 					<!-- ページング -->
 
