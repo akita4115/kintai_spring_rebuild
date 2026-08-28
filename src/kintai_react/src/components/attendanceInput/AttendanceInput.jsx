@@ -82,8 +82,48 @@ const AttendanceInput = () => {
 	 * 表示ボタン
 	 */
 	const handleDisplay = () => {
+
+		//年月未選択チェック
+		if(!targetMonth) {
+			setErrorMessage("年月が選択されていません。");
+			return;
+		}
+		setErrorMessage("");
+
 		getAttendanceList();
 	};
+
+	const handlSeave = async () => {
+
+		const response = await fetch(
+			"/api/attendance/save",
+			{
+				method: "POST",
+				headers: {
+					"Content-Type":
+						"applocation/json",
+				},
+				body: JSON.stringify({
+					targetMonth,
+					attendanceList,
+				}),
+			}
+		);
+
+		if(!response.ok) {
+			setErrorMessage(
+				"保存に失敗しました。"
+			);
+			return;
+		}
+
+		alert("保存しました。");
+
+		getAttendanceList();
+	};
+	
+
+
 
 	/**
 	 * HH:mmを分へ変換
@@ -303,6 +343,13 @@ const calculateWorkingHours = (attendance) => {
 				勤怠入力
 			</h2>
 
+			{/* エラーメッセージ */}
+			{errorMessage && (
+				<div className="alert alert-danger">
+					{errorMessage}
+				</div>
+			)}
+
 			{/* 年月入力 */}
 			<div className="card mb-4">
 
@@ -344,19 +391,13 @@ const calculateWorkingHours = (attendance) => {
 							</button>
 
 						</div>
-
+						
+						
 					</div>
 
 				</div>
 
 			</div>
-
-			{/* エラーメッセージ */}
-			{errorMessage && (
-				<div className="alert alert-danger">
-					{errorMessage}
-				</div>
-			)}
 
 			{/* カレンダー */}
 			<div className="card">
@@ -373,6 +414,7 @@ const calculateWorkingHours = (attendance) => {
 						<button
 							type="button"
 							className="btn btn-primary me-2"
+							onClick={handleSave}
 						>
 							保存
 						</button>
@@ -387,7 +429,7 @@ const calculateWorkingHours = (attendance) => {
 					</div>
 
 					<div className="table-responsive">
-						<table className="table table-bordered align-middle">
+						<table className="table table-hover align-middle">
 
 							<thead className="table-dark">
 
