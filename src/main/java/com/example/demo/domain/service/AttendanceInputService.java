@@ -6,7 +6,7 @@ import java.util.List;
 import com.example.demo.domain.model.AttendanceInputDetail;
 
 /**
- * 勤怠入力サービス
+ * 勤怠入力のサービス
  */
 public interface AttendanceInputService {
 
@@ -18,4 +18,9 @@ public interface AttendanceInputService {
 	 */
 	public List<AttendanceInputDetail> getAttendanceList(
 			YearMonth targetMonth);
+	
+	public void saveAttendance(
+			String email,
+			YearMonth targetMonth,
+			List<AttendanceInputDetail> attendanceList);
 }

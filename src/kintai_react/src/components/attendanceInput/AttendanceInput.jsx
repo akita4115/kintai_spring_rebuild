@@ -93,10 +93,11 @@ const AttendanceInput = () => {
 		getAttendanceList();
 	};
 
+	//保存ボタン
 	const handlSeave = async () => {
 
 		const response = await fetch(
-			"/api/attendance/save",
+			"/api/attendance/input/save",
 			{
 				method: "POST",
 				headers: {
@@ -110,6 +111,7 @@ const AttendanceInput = () => {
 			}
 		);
 
+		//保存チェック
 		if(!response.ok) {
 			setErrorMessage(
 				"保存に失敗しました。"
@@ -121,7 +123,7 @@ const AttendanceInput = () => {
 
 		getAttendanceList();
 	};
-	
+
 
 
 

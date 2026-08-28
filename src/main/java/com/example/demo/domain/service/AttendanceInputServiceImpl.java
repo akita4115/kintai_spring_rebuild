@@ -130,6 +130,17 @@ public class AttendanceInputServiceImpl
 
 		return attendanceList;
 	}
+	
+	/**
+	 * 勤怠情報を保存する
+	 */
+	@Override
+	public void saveAttendance(
+			String email,
+			YearMonth targetMonth,
+			List<AttendanceInputDetail> attendanceList) {
+		
+	}
 
 	/**
 	 * 曜日を日本語へ変換

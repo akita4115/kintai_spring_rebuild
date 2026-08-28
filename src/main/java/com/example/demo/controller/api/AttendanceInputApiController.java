@@ -7,8 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,13 +36,9 @@ public class AttendanceInputApiController {
 	 */
 	@GetMapping
 	public AttendanceInputEntity getAttendanceInput(
-			@RequestParam(
-					name = "targetMonth",
-					required = false)
-			String targetMonth) {
+			@RequestParam(name = "targetMonth", required = false) String targetMonth) {
 
-		AttendanceInputEntity attendanceInputEntity =
-				new AttendanceInputEntity();
+		AttendanceInputEntity attendanceInputEntity = new AttendanceInputEntity();
 
 		try {
 			YearMonth yearMonth;
@@ -51,14 +50,12 @@ public class AttendanceInputApiController {
 				yearMonth = YearMonth.now();
 
 			} else {
-				yearMonth =
-						YearMonth.parse(targetMonth);
+				yearMonth = YearMonth.parse(targetMonth);
 			}
 
 			// Serviceから勤怠一覧を取得
-			List<AttendanceInputDetail> attendanceList =
-					attendanceInputService
-						.getAttendanceList(yearMonth);
+			List<AttendanceInputDetail> attendanceList = attendanceInputService
+					.getAttendanceList(yearMonth);
 
 			attendanceInputEntity.setTargetMonth(
 					yearMonth.toString());
@@ -76,8 +73,7 @@ public class AttendanceInputApiController {
 					"年月の形式が正しくありません。",
 					ex);
 
-			Map<String, String> errors =
-					new HashMap<>();
+			Map<String, String> errors = new HashMap<>();
 
 			errors.put(
 					"targetMonth",
@@ -92,8 +88,7 @@ public class AttendanceInputApiController {
 					"勤怠入力データの取得に失敗しました。",
 					ex);
 
-			Map<String, String> errors =
-					new HashMap<>();
+			Map<String, String> errors = new HashMap<>();
 
 			errors.put(
 					"attendance",
@@ -103,5 +98,66 @@ public class AttendanceInputApiController {
 
 			return attendanceInputEntity;
 		}
+	}
+
+	/**
+	 * POST 勤怠情報保存
+	 */
+	@PostMapping("/save")
+	public AttendanceInputEntity saveAttendance(
+			@RequestBody AttendanceInputEntity request,
+			Authentication authentication) {
+
+		try {
+			//ログイン中のユーザのメールアドレス
+			String email = authentication.getName();
+
+			//React	から受け取った年月をYearMonthに変換
+			YearMonth targetMonth = YearMonth.parse(request.getTargetMonth());
+
+			//serviceの保存処理を呼び出す
+			attendanceInputService.saveAttendance(
+					email,
+					targetMonth,
+					request.getAttendanceList());
+
+			log.info(
+					"勤怠保存完了：email={}, targetMonth={}",
+					email,
+					targetMonth);
+
+			return request;
+
+		} catch (DateTimeParseException ex) {
+			log.error(
+					"年月の形式が正しくありません。",
+					ex);
+
+			Map<String, String> errors = new HashMap<>();
+
+			errors.put(
+					"targetMonth",
+					"年月の形式が正しくありません。");
+
+			request.setErrors(errors);
+
+			return request;
+
+		} catch (Exception ex) {
+			log.error(
+					"勤怠情報の保存に失敗しました。",
+					ex);
+
+			Map<String, String> errors = new HashMap<>();
+
+			errors.put(
+					"attendance",
+					"勤怠情報の保存に失敗しました。");
+
+			request.setErrors(errors);
+
+			return request;
+		}
+
 	}
 }
