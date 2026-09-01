@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.repository.AttendanceMapper">
+
+	<!-- メールアドレスからユーザーIDを取得 -->
+	<select id="findUserIdByEmail"
+		resultType="long">
+		SELECT
+		id
+		FROM
+		users
+		WHERE
+		email = #{email}
+	</select>
+
+	<!-- ユーザーIDと年月から勤怠ヘッダーIDを取得 -->
+	<select id="findAttendanceHeadId"
+		resultType="long">
+		SELECT
+		id
+		FROM
+		attendance_heads
+		WHERE
+		user_id = #{userId}
+		AND
+		yyyymm = #{yyyymm}
+	</select>
+
+	<!-- 勤怠ヘッダーのステータスを取得 -->
+	<select id="findAttendanceHeadStatus"
+		resultType="string">
+		SELECT
+		status
+		FROM
+		attendance_heads
+		WHERE
+		id = #{attendanceHeadId}
+
+	</select>
+
+	<!-- 保存済みの勤怠明細を取得 -->
+	<select id="findAttendanceDetails"
+		resultType="com.example.demo.domain.model.AttendanceInputDetail">
+
+		SELECT
+		day AS attendance_date,
+		kbn,
+		start_time AS startTime,
+		end_time AS endTime,
+		rest_time AS breakTime,
+		night_rest_time AS nightBreakTime,
+		work_time AS workTime,
+		over_time AS overTime,
+		remarks
+		FROM
+		attendance_details
+		WHERE
+		attendance_head_id = #{attendanceHeadId}
+		ORDER BY
+		day
+
+	</select>
+
+	<!-- 勤怠ヘッダーを登録 -->
+	<insert id="insertAttendanceHead">
+		INSERT INTO attendance_heads (
+		user_id,
+		yyyymm,
+		status,
+		reject_comment,
+		created_at,
+		updated_at
+		) VALUES (
+		#{userId},
+		#{yyyymm},
+		#{status},
+		NULL,
+		CURRENT_TIMESTAMP,
+		CURRENT_TIMESTAMP
+		)
+	</insert>
+
+	<!-- 既存の勤怠明細を削除 -->
+	<delete id="deleteAttendanceDetails">
+		DELETE FROM
+		attendance_details
+		WHERE
+		attendance_head_id = #{attendanceHeadId}
+	</delete>
+
+	<!-- 1か月分の勤怠明細を一括登録 -->
+	<insert id="insertAttendanceDetails"> INSERT INTO attendance_details (
+		attendance_head_id, day, kbn, start_time, end_time, rest_time,
+		night_rest_time, work_time, over_time, remarks, created_at, updated_at )
+		VALUES <foreach
+			collection="attendanceList"
+			item="attendance"
+			separator=",">
+			(
+			#{attendanceHeadId},
+			SUBSTRING(#{attendance.attendanceDate}, 9, 2),
+			#{attendance.kbn},
+			NULLIF(#{attendance.startTime}, ''),
+			NULLIF(#{attendance.endTime}, ''),
+			NULLIF(#{attendance.breakTime}, ''),
+		NULLIF(#{attendance.nightBreakTime}, ''),
+			NULLIF(#{attendance.workTime}, ''),
+			NULLIF(#{attendance.overTime}, ''),
+			#{attendance.remarks},
+			CURRENT_TIMESTAMP,
+			CURRENT_TIMESTAMP
+			)
+		</foreach>
+	</insert>
+
+</mapper>

@@ -14,21 +14,17 @@ import com.example.demo.domain.model.AttendanceInputDetail;
 public interface AttendanceMapper {
 
 	//メールアドレスからユーザーIDを取得する
-
 	public Long findUserIdByEmail(
 			@Param("email") String email);
 
 	
 	//ユーザーIDと年月から勤怠ヘッダーIDを取得する
-	 
-	
 	public Long findAttendanceHeadId(
 			@Param("userId") Long userId,
 			@Param("yyyymm") String yyyymm);
 
 	
 	//勤怠ヘッダーを登録する
-
 	public void insertAttendanceHead(
 			@Param("userId") Long userId,
 			@Param("yyyymm") String yyyymm,
@@ -36,14 +32,26 @@ public interface AttendanceMapper {
 
 	
 	//対象ヘッダーに紐づく勤怠明細を削除する
-	
 	public void deleteAttendanceDetails(
 			@Param("attendanceHeadId") Long attendanceHeadId);
 
 
 	//勤怠明細を登録する
-	
 	public void insertAttendanceDetails(
 			@Param("attendanceHeadId") Long attendanceHeadId,
 			@Param("attendanceList") List<AttendanceInputDetail> attendanceList);
+	
+	
+	//勤怠ヘッダーのステータスを取得する
+	public String findAttendanceHeadStatus(
+			@Param("attendanceHeadId")
+			Long attendanceHeadId);
+	
+	
+	//勤怠明細を取得する
+	public List<AttendanceInputDetail> findAttendanceDetails(
+			@Param("attendanceHeadId")
+			Long attendanceHeadId);
+	
+	
 }

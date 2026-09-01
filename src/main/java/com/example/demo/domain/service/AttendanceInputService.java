@@ -10,17 +10,23 @@ import com.example.demo.domain.model.AttendanceInputDetail;
  */
 public interface AttendanceInputService {
 
-	/**
-	 * 指定年月の勤怠入力一覧を取得
-	 *
-	 * @param targetMonth 表示対象年月
-	 * @return 1か月分の勤怠入力一覧
-	 */
+	
+	 // 指定年月の勤怠入力一覧を取得
+
 	public List<AttendanceInputDetail> getAttendanceList(
+			String email,
 			YearMonth targetMonth);
 	
+	//勤怠情報を保存する
 	public void saveAttendance(
 			String email,
 			YearMonth targetMonth,
 			List<AttendanceInputDetail> attendanceList);
+	
+	
+	//指定年月の勤怠ステータスを取得する
+	public String getAttendanceStatus(
+			String email,
+			YearMonth targetMonth);
+
 }

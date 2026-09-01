@@ -18,9 +18,16 @@ const AttendanceInput = () => {
 	const [attendanceList, setAttendanceList] =
 		useState([]);
 
+	// 勤怠ステータス
+	const [statusCd, setStatusCd] = useState(null);
+
 	// エラーメッセージ
 	const [errorMessage, setErrorMessage] =
 		useState("");
+
+	//編集不可状態
+	const isLocked =
+		statusCd === "1" || statusCd === "3";
 
 	/**
 	 * 勤怠入力データを取得
@@ -54,11 +61,15 @@ const AttendanceInput = () => {
 				return;
 			}
 
+
 			setAttendanceList(
 				data.attendanceList ?? []
 			);
 
+			setStatusCd(data.statusCd ?? null);
+
 			setErrorMessage("");
+
 
 		} catch (error) {
 			console.error(error);
@@ -94,7 +105,7 @@ const AttendanceInput = () => {
 	};
 
 	//保存ボタン
-	const handlSeave = async () => {
+	const handleSave = async () => {
 
 		const response = await fetch(
 			"/api/attendance/input/save",
@@ -102,7 +113,7 @@ const AttendanceInput = () => {
 				method: "POST",
 				headers: {
 					"Content-Type":
-						"applocation/json",
+						"application/json",
 				},
 				body: JSON.stringify({
 					targetMonth,
@@ -417,6 +428,7 @@ const calculateWorkingHours = (attendance) => {
 							type="button"
 							className="btn btn-primary me-2"
 							onClick={handleSave}
+							disabled={isLocked}
 						>
 							保存
 						</button>
@@ -424,6 +436,7 @@ const calculateWorkingHours = (attendance) => {
 						<button
 							type="button"
 							className="btn btn-success"
+							disabled={isLocked}
 						>
 							申請
 						</button>
@@ -482,6 +495,7 @@ const calculateWorkingHours = (attendance) => {
 												<select
 													className="form-select"
 													value={attendance.kbn}
+													disabled={isLocked}
 													onChange={(event) =>
 														handleAttendanceChange(
 															index,
@@ -508,6 +522,7 @@ const calculateWorkingHours = (attendance) => {
 													value={
 														attendance.startTime
 													}
+													disabled={isLocked}
 													onChange={(event) =>
 														handleAttendanceChange(
 															index,
@@ -525,6 +540,7 @@ const calculateWorkingHours = (attendance) => {
 													value={
 														attendance.endTime
 													}
+													disabled={isLocked}
 													onChange={(event) =>
 														handleAttendanceChange(
 															index,
@@ -542,6 +558,7 @@ const calculateWorkingHours = (attendance) => {
 													value={
 														attendance.breakTime
 													}
+													disabled={isLocked}
 													onChange={(event) =>
 														handleAttendanceChange(
 															index,
@@ -560,6 +577,7 @@ const calculateWorkingHours = (attendance) => {
 														attendance
 															.nightBreakTime
 													}
+													disabled={isLocked}
 													onChange={(event) =>
 														handleAttendanceChange(
 															index,
@@ -577,6 +595,7 @@ const calculateWorkingHours = (attendance) => {
 													value={
 														attendance.workTime
 													}
+													disabled={isLocked}
 													readOnly
 												/>
 											</td>
@@ -588,6 +607,7 @@ const calculateWorkingHours = (attendance) => {
 													value={
 														attendance.overTime
 													}
+													disabled={isLocked}
 													readOnly
 												/>
 											</td>
@@ -599,6 +619,7 @@ const calculateWorkingHours = (attendance) => {
 													value={
 														attendance.remarks
 													}
+													disabled={isLocked}
 													onChange={(event) =>
 														handleAttendanceChange(
 															index,
