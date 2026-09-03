@@ -6,17 +6,20 @@
 	<!-- メールアドレスからユーザーIDを取得 -->
 	<select id="findUserIdByEmail"
 		resultType="long">
+		
 		SELECT
 		id
 		FROM
 		users
 		WHERE
 		email = #{email}
+		
 	</select>
 
 	<!-- ユーザーIDと年月から勤怠ヘッダーIDを取得 -->
 	<select id="findAttendanceHeadId"
 		resultType="long">
+		
 		SELECT
 		id
 		FROM
@@ -25,19 +28,36 @@
 		user_id = #{userId}
 		AND
 		yyyymm = #{yyyymm}
+		
 	</select>
+
 
 	<!-- 勤怠ヘッダーのステータスを取得 -->
 	<select id="findAttendanceHeadStatus"
 		resultType="string">
+		
 		SELECT
 		status
 		FROM
 		attendance_heads
 		WHERE
 		id = #{attendanceHeadId}
-
+		
 	</select>
+
+	<!-- 勤怠ステータスを更新 -->
+	<update id="updateAttendanceStatus">
+
+		UPDATE
+		attendance_heads
+		SET
+		status = #{status},
+		reject_comment = NULL,
+		updated_at = CURRENT_TIMESTAMP
+		WHERE
+		id = #{attendanceHeadId}
+		
+	</update>
 
 	<!-- 保存済みの勤怠明細を取得 -->
 	<select id="findAttendanceDetails"
@@ -64,6 +84,7 @@
 
 	<!-- 勤怠ヘッダーを登録 -->
 	<insert id="insertAttendanceHead">
+		
 		INSERT INTO attendance_heads (
 		user_id,
 		yyyymm,
@@ -79,39 +100,60 @@
 		CURRENT_TIMESTAMP,
 		CURRENT_TIMESTAMP
 		)
+		
 	</insert>
 
 	<!-- 既存の勤怠明細を削除 -->
 	<delete id="deleteAttendanceDetails">
-		DELETE FROM
-		attendance_details
-		WHERE
-		attendance_head_id = #{attendanceHeadId}
+	
+	    DELETE FROM
+	        attendance_details
+	    WHERE
+	        attendance_head_id = #{attendanceHeadId}
+	
 	</delete>
-
+	
 	<!-- 1か月分の勤怠明細を一括登録 -->
-	<insert id="insertAttendanceDetails"> INSERT INTO attendance_details (
-		attendance_head_id, day, kbn, start_time, end_time, rest_time,
-		night_rest_time, work_time, over_time, remarks, created_at, updated_at )
-		VALUES <foreach
-			collection="attendanceList"
-			item="attendance"
-			separator=",">
-			(
-			#{attendanceHeadId},
-			SUBSTRING(#{attendance.attendanceDate}, 9, 2),
-			#{attendance.kbn},
-			NULLIF(#{attendance.startTime}, ''),
-			NULLIF(#{attendance.endTime}, ''),
-			NULLIF(#{attendance.breakTime}, ''),
-		NULLIF(#{attendance.nightBreakTime}, ''),
-			NULLIF(#{attendance.workTime}, ''),
-			NULLIF(#{attendance.overTime}, ''),
-			#{attendance.remarks},
-			CURRENT_TIMESTAMP,
-			CURRENT_TIMESTAMP
-			)
-		</foreach>
+	<insert id="insertAttendanceDetails">
+	
+	    INSERT INTO attendance_details (
+	        attendance_head_id,
+	        day,
+	        kbn,
+	        start_time,
+	        end_time,
+	        rest_time,
+	        night_rest_time,
+	        work_time,
+	        over_time,
+	        remarks,
+	        created_at,
+	        updated_at
+	    )
+	    VALUES
+	
+	    <foreach
+	        collection="attendanceList"
+	        item="attendance"
+	        separator=",">
+	
+	        (
+	            #{attendanceHeadId},
+	            SUBSTRING(#{attendance.attendanceDate}, 9, 2),
+	            #{attendance.kbn},
+	            NULLIF(#{attendance.startTime}, ''),
+	            NULLIF(#{attendance.endTime}, ''),
+	            NULLIF(#{attendance.breakTime}, ''),
+	            NULLIF(#{attendance.nightBreakTime}, ''),
+	            NULLIF(#{attendance.workTime}, ''),
+	            NULLIF(#{attendance.overTime}, ''),
+	            #{attendance.remarks},
+	            CURRENT_TIMESTAMP,
+	            CURRENT_TIMESTAMP
+	        )
+	
+	    </foreach>
+	
 	</insert>
-
-</mapper>
+	
+	</mapper>

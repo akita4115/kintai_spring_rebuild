@@ -23,6 +23,12 @@ public interface AttendanceInputService {
 			YearMonth targetMonth,
 			List<AttendanceInputDetail> attendanceList);
 	
+	// 勤怠情報を申請する
+	public void applyAttendance(
+	        String email,
+	        YearMonth targetMonth,
+	        List<AttendanceInputDetail> attendanceList);
+	
 	
 	//指定年月の勤怠ステータスを取得する
 	public String getAttendanceStatus(

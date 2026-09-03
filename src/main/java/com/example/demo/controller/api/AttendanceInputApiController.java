@@ -36,8 +36,7 @@ public class AttendanceInputApiController {
 	 */
 	@GetMapping
 	public AttendanceInputEntity getAttendanceInput(
-			@RequestParam(name = "targetMonth", required = false)  
-			String targetMonth, Authentication authentication) {
+			@RequestParam(name = "targetMonth", required = false) String targetMonth, Authentication authentication) {
 
 		AttendanceInputEntity attendanceInputEntity = new AttendanceInputEntity();
 
@@ -55,61 +54,57 @@ public class AttendanceInputApiController {
 			}
 
 			// Serviceから勤怠一覧を取得
-			 String email = authentication.getName();
+			String email = authentication.getName();
 
-		        List<AttendanceInputDetail> attendanceList =
-		                attendanceInputService.getAttendanceList(
-		                        email,
-		                        yearMonth);
+			List<AttendanceInputDetail> attendanceList = attendanceInputService.getAttendanceList(
+					email,
+					yearMonth);
 
-		        attendanceInputEntity.setTargetMonth(
-		                yearMonth.toString());
+			attendanceInputEntity.setTargetMonth(
+					yearMonth.toString());
 
-		        attendanceInputEntity.setAttendanceList(
-		                attendanceList);
-		        
-		        String statusCd =
-		        		attendanceInputService.getAttendanceStatus(
-		        				email,
-		        				yearMonth);
-		        
-		        attendanceInputEntity.setStatusCd(statusCd);
+			attendanceInputEntity.setAttendanceList(
+					attendanceList);
 
-		        return attendanceInputEntity;
+			String statusCd = attendanceInputService.getAttendanceStatus(
+					email,
+					yearMonth);
 
-		    } catch (DateTimeParseException ex) {
-		        log.error(
-		                "年月の形式が正しくありません。",
-		                ex);
+			attendanceInputEntity.setStatusCd(statusCd);
 
-		        Map<String, String> errors =
-		                new HashMap<>();
+			return attendanceInputEntity;
 
-		        errors.put(
-		                "targetMonth",
-		                "年月の形式が正しくありません。");
+		} catch (DateTimeParseException ex) {
+			log.error(
+					"年月の形式が正しくありません。",
+					ex);
 
-		        attendanceInputEntity.setErrors(errors);
+			Map<String, String> errors = new HashMap<>();
 
-		        return attendanceInputEntity;
+			errors.put(
+					"targetMonth",
+					"年月の形式が正しくありません。");
 
-		    } catch (Exception ex) {
-		        log.error(
-		                "勤怠入力データの取得に失敗しました。",
-		                ex);
+			attendanceInputEntity.setErrors(errors);
 
-		        Map<String, String> errors =
-		                new HashMap<>();
+			return attendanceInputEntity;
 
-		        errors.put(
-		                "attendance",
-		                "勤怠入力データの取得に失敗しました。");
+		} catch (Exception ex) {
+			log.error(
+					"勤怠入力データの取得に失敗しました。",
+					ex);
 
-		        attendanceInputEntity.setErrors(errors);
+			Map<String, String> errors = new HashMap<>();
 
-		        return attendanceInputEntity;
-		    }
+			errors.put(
+					"attendance",
+					"勤怠入力データの取得に失敗しました。");
+
+			attendanceInputEntity.setErrors(errors);
+
+			return attendanceInputEntity;
 		}
+	}
 
 	/**
 	 * POST 勤怠情報保存
@@ -170,5 +165,69 @@ public class AttendanceInputApiController {
 			return request;
 		}
 
+	}
+
+	/**
+	 * POST 勤怠情報申請
+	 */
+	@PostMapping("/apply")
+	public AttendanceInputEntity applyAttendance(
+			@RequestBody AttendanceInputEntity request,
+			Authentication authentication) {
+
+		try {
+			// ログイン中のユーザーのメールアドレス
+			String email = authentication.getName();
+
+			// Reactから受け取った年月をYearMonthへ変換
+			YearMonth targetMonth = YearMonth.parse(
+					request.getTargetMonth());
+
+			// Serviceの申請処理を呼び出す
+			attendanceInputService.applyAttendance(
+					email,
+					targetMonth,
+					request.getAttendanceList());
+
+			// 申請後のステータス
+			request.setStatusCd("1");
+
+			log.info(
+					"勤怠申請完了：email={}, targetMonth={}",
+					email,
+					targetMonth);
+
+			return request;
+
+		} catch (DateTimeParseException ex) {
+			log.error(
+					"年月の形式が正しくありません。",
+					ex);
+
+			Map<String, String> errors = new HashMap<>();
+
+			errors.put(
+					"targetMonth",
+					"年月の形式が正しくありません。");
+
+			request.setErrors(errors);
+
+			return request;
+
+		} catch (Exception ex) {
+			log.error(
+					"勤怠情報の申請に失敗しました。",
+					ex);
+
+			Map<String, String> errors = new HashMap<>();
+
+			errors.put(
+					"attendance",
+					"勤怠情報の申請に失敗しました。");
+
+			request.setErrors(errors);
+
+			return request;
+		}
 	}
 }

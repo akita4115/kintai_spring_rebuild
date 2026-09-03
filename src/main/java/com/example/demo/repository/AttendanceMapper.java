@@ -54,4 +54,10 @@ public interface AttendanceMapper {
 			Long attendanceHeadId);
 	
 	
+	//勤怠ステータスを更新する
+	public void updateAttendanceStatus(
+			@Param("attendanceHeadId")
+			Long attendanceHeadId,
+			@Param("status")
+			String status);
 }
