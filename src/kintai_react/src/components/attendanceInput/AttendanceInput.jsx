@@ -33,6 +33,32 @@ const AttendanceInput = () => {
 	const isLocked =
 		statusCd === "1" || statusCd === "3";
 
+	//日ごとの勤怠区分選択肢
+	const getkbnOption = (attendance) => {
+
+		const isHolidayRow =
+		attendance.holiday
+		|| attendance.dayOfWeek === "土"
+		|| attendance.dayOfWeek === "日";
+
+	if (isHolidayRow) {
+		return[
+			{ value: "2",label: "休日" },
+			{ value: "4",label: "休出" },
+		];
+	}
+
+	return[
+		{ value: "1", label: "出勤" },
+        { value: "3", label: "有給" },
+        { value: "5", label: "欠勤" },
+        { value: "6", label: "特休" },
+        { value: "7", label: "代休" },
+        { value: "8", label: "振休" },
+    ];
+};
+
+
 	/**
 	 * 勤怠入力データを取得
 	 */
@@ -537,14 +563,17 @@ const calculateWorkingHours = (attendance) => {
 														)
 													}
 												>
-													<option value="1">出勤</option>
-													<option value="2">休日</option>
-													<option value="3">有給</option>
-													<option value="4">休出</option>
-													<option value="5">欠勤</option>
-													<option value="6">特休</option>
-													<option value="7">代休</option>
-													<option value="8">振休</option>
+													{getkbnOptions(attendance).map(
+														(option) => (
+															<option
+																key={option.value}
+																value={option.value}
+															>
+																{option.label}
+															</option>
+														)
+													)}
+													
 												</select>
 											</td>
 
