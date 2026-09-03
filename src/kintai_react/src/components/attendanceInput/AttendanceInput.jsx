@@ -107,6 +107,9 @@ const AttendanceInput = () => {
 	//保存ボタン
 	const handleSave = async () => {
 
+		try{
+			setErrorMessage("");
+		
 		const response = await fetch(
 			"/api/attendance/input/save",
 			{
@@ -122,17 +125,31 @@ const AttendanceInput = () => {
 			}
 		);
 
-		//保存チェック
-		if(!response.ok) {
+		const data = await response.json();
+
+		//HTTPエラーまたはjava側の処理エラー
+		if(
+			!response.ok || (data.errors && Object.keys(data.errors).lengs > 0)
+		){
 			setErrorMessage(
-				"保存に失敗しました。"
+				data.errors ? Object.values(data.errors)[0]
+				:"保存に失敗しました。"
 			);
 			return;
 		}
 
-		alert("保存しました。");
+		alert("保存が完了しました。");
 
-		getAttendanceList();
+		await getAttendanceList();
+
+	} catch (error) {
+		console.error(error);
+
+		setErrorMessage(
+			"保存に失敗しました。"
+		);
+	}
+
 	};
 
 
