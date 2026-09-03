@@ -19,6 +19,20 @@ document.addEventListener("DOMContentLoaded", function() {
 			"change",
 			function() {
 
+				// すべての行から選択時の背景色を外す
+				radioButtons.forEach(function(item) {
+
+					item.closest("tr").classList.remove(
+						"table-active"
+					);
+
+				});
+
+				// 現在選択している行の背景色を変える
+				radio.closest("tr").classList.add(
+					"table-active"
+				);
+
 				updateButton.disabled = false;
 				deleteButton.disabled = false;
 
