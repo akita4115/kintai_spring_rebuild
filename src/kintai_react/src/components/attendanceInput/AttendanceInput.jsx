@@ -25,6 +25,10 @@ const AttendanceInput = () => {
 	const [errorMessage, setErrorMessage] =
 		useState("");
 
+	// 成功メッセージ
+	const [successMessage, setSuccessMessage] =
+    useState("");
+
 	//編集不可状態
 	const isLocked =
 		statusCd === "1" || statusCd === "3";
@@ -94,6 +98,8 @@ const AttendanceInput = () => {
 	 */
 	const handleDisplay = () => {
 
+		setSuccessMessage("");
+
 		//年月未選択チェック
 		if(!targetMonth) {
 			setErrorMessage("年月が選択されていません。");
@@ -109,6 +115,7 @@ const AttendanceInput = () => {
 
 		try{
 			setErrorMessage("");
+			setSuccessMessage("");
 		
 		const response = await fetch(
 			"/api/attendance/input/save",
@@ -129,7 +136,7 @@ const AttendanceInput = () => {
 
 		//HTTPエラーまたはjava側の処理エラー
 		if(
-			!response.ok || (data.errors && Object.keys(data.errors).lengs > 0)
+			!response.ok || (data.errors && Object.keys(data.errors).length > 0)
 		){
 			setErrorMessage(
 				data.errors ? Object.values(data.errors)[0]
@@ -138,9 +145,11 @@ const AttendanceInput = () => {
 			return;
 		}
 
-		alert("保存が完了しました。");
-
 		await getAttendanceList();
+
+		setSuccessMessage(
+			"保存が完了しました。"
+		);
 
 	} catch (error) {
 		console.error(error);
@@ -377,6 +386,13 @@ const calculateWorkingHours = (attendance) => {
 			{errorMessage && (
 				<div className="alert alert-danger">
 					{errorMessage}
+				</div>
+			)}
+
+			{/*成功メッセージ*/}
+			{successMessage && (
+				<div className="alert alert-primary">
+					{successMessage}
 				</div>
 			)}
 
