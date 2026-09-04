@@ -503,7 +503,7 @@ const AttendanceInput = () => {
                   <th>夜休憩時間</th>
                   <th>勤務時間</th>
                   <th>残業時間</th>
-                  <th>備考</th>
+                  <th >備考</th>
                 </tr>
               </thead>
 
