@@ -202,10 +202,27 @@ public class AttendanceInputServiceImpl
 				DateTimeFormatter.ofPattern(
 						"yyyyMM"));
 
-		Long attendanceHeadId = attendanceMapper.findAttendanceHeadId(
-				userId,
-				yyyymm);
+		Long attendanceHeadId =
+				attendanceMapper.findAttendanceHeadId(
+						userId,
+						yyyymm);
 
+		// 申請中・承認済みの勤怠は変更不可
+		if (attendanceHeadId != null) {
+
+			String status =
+					attendanceMapper.findAttendanceHeadStatus(
+							attendanceHeadId);
+
+			if ("1".equals(status)
+					|| "3".equals(status)) {
+
+				throw new IllegalStateException(
+						"申請中または承認済みの勤怠は変更できません。");
+			}
+		}
+
+		// 勤怠ヘッダーが未登録の場合
 		if (attendanceHeadId == null) {
 
 			attendanceMapper.insertAttendanceHead(
@@ -213,9 +230,10 @@ public class AttendanceInputServiceImpl
 					yyyymm,
 					"0");
 
-			attendanceHeadId = attendanceMapper.findAttendanceHeadId(
-					userId,
-					yyyymm);
+			attendanceHeadId =
+					attendanceMapper.findAttendanceHeadId(
+							userId,
+							yyyymm);
 		}
 
 		if (attendanceHeadId == null) {

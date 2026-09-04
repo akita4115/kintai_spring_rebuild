@@ -517,7 +517,7 @@ const AttendanceInput = () => {
                       {Number(attendance.attendanceDate.slice(8))}
                     </td>
 
-                    <td className={getDateTextClassName(attendance)}>
+                    <td className={`text-center ${getDateTextClassName(attendance)}`}>
                       {attendance.dayOfWeek}
                     </td>
 
