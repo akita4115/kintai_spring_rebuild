@@ -17,6 +17,12 @@ const AttendanceInput = () => {
   // 勤怠ステータス
   const [statusCd, setStatusCd] = useState(null);
 
+  //差戻年月
+  const [rejectedMonth, setRejectedMonth] = useState(null);
+
+  //差戻理由
+  const [rejectedReason, setRejectedReason] = useState("");
+
   // エラーメッセージ
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -27,7 +33,7 @@ const AttendanceInput = () => {
   const [showApplyModal, setShowApplyModal] = useState(false);
 
   //申請完了メッセージ
-  const [applyMessage, setShowApplyMessage] = useState("");
+  const [applyMessage, setApplyMessage] = useState("");
 
   //編集不可状態
   const isLocked = statusCd === "1" || statusCd === "3";
@@ -82,6 +88,10 @@ const AttendanceInput = () => {
 
       setStatusCd(data.statusCd ?? null);
 
+      //差戻情報
+      setRejectedMonth(data.rejectedMonth ?? null);
+      setRejectedReason(data.rejectedReason ?? "");
+
       setErrorMessage("");
     } catch (error) {
       console.error(error);
@@ -104,6 +114,7 @@ const AttendanceInput = () => {
    */
   const handleDisplay = () => {
     setSuccessMessage("");
+    setApplyMessage("");
 
     //年月未選択チェック
     if (!targetMonth) {
@@ -118,7 +129,7 @@ const AttendanceInput = () => {
   //申請モーダルを開く
   const handleOpenApplyModal = () => {
     setSuccessMessage("");
-    setShowApplyMessage("");
+    setApplyMessage("");
     setErrorMessage("");
     setShowApplyModal(true);
   };
@@ -167,8 +178,6 @@ const AttendanceInput = () => {
 
       //申請完了メッセージを表示
       setApplyMessage("申請が完了しました。");
-
-      setSuccessMessage("申請が完了しました。");
     } catch (error) {
       console.error(error);
       setErrorMessage("申請に失敗しました。");
@@ -376,6 +385,23 @@ const AttendanceInput = () => {
     return "";
   };
 
+  /**
+   * 曜日・祝日による文字色
+   */
+  const getDateTextClassName = (attendance) => {
+    // 国民の祝日・祝日マスタ・日曜日
+    if (attendance.holiday || attendance.dayOfWeek === "日") {
+      return "text-danger";
+    }
+
+    // 土曜日
+    if (attendance.dayOfWeek === "土") {
+      return "text-primary";
+    }
+
+    return "";
+  };
+
   return (
     <div className="container mt-4">
       <h2 className="mb-3">勤怠入力</h2>
@@ -386,6 +412,11 @@ const AttendanceInput = () => {
       {/*成功メッセージ*/}
       {successMessage && (
         <div className="alert alert-primary">{successMessage}</div>
+      )}
+
+      {/* 申請完了メッセージ */}
+      {applyMessage && (
+        <div className="alert alert-success">{applyMessage}</div>
       )}
 
       {/* 年月入力 */}
@@ -467,9 +498,13 @@ const AttendanceInput = () => {
                     key={attendance.attendanceDate}
                     className={getRowClassName(attendance)}
                   >
-                    <td>{attendance.attendanceDate.slice(8)}</td>
+                    <td className={getDateTextClassName(attendance)}>
+                      {attendance.attendanceDate.slice(8)}
+                    </td>
 
-                    <td>{attendance.dayOfWeek}</td>
+                    <td className={getDateTextClassName(attendance)}>
+                      {attendance.dayOfWeek}
+                    </td>
 
                     <td>
                       <select

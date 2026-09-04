@@ -12,13 +12,20 @@ public class AttendanceInputEntity {
 
 	//表示対象年月
 	private String targetMonth;
-	
+
 	//申請状態
 	private String statusCd;
-	
+
+	//差戻年月
+	private String rejectedMonth;
+
+	//差戻理由
+	private String rejectedReason;
+
 	//一か月分の勤怠データ
 	private List<AttendanceInputDetail> attendanceList;
-	
+
 	//エラーメッセージ
 	private Map<String, String> errors;
+
 }

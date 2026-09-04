@@ -3,6 +3,7 @@ package com.example.demo.domain.service;
 import java.time.YearMonth;
 import java.util.List;
 
+import com.example.demo.domain.entity.AttendanceInputEntity;
 import com.example.demo.domain.model.AttendanceInputDetail;
 
 /**
@@ -34,5 +35,9 @@ public interface AttendanceInputService {
 	public String getAttendanceStatus(
 			String email,
 			YearMonth targetMonth);
+	
+	//差戻中の勤怠情報を取得する
+	public AttendanceInputEntity getRejectedAttendance(
+			String email);
 
 }

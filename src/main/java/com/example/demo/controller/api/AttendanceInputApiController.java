@@ -71,8 +71,22 @@ public class AttendanceInputApiController {
 					yearMonth);
 
 			attendanceInputEntity.setStatusCd(statusCd);
-
+			
+			//差戻中の勤怠情報を取得
+			AttendanceInputEntity rejectedAttendance = 
+					attendanceInputService.getRejectedAttendance(email);
+			
+			if (rejectedAttendance != null) {
+				attendanceInputEntity.setRejectedMonth(
+						rejectedAttendance.getRejectedMonth());
+				
+				attendanceInputEntity.setRejectedReason(
+						rejectedAttendance.getRejectedReason());
+			}
+			
 			return attendanceInputEntity;
+			
+			
 
 		} catch (DateTimeParseException ex) {
 			log.error(

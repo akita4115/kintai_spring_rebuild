@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.domain.entity.AttendanceInputEntity;
 import com.example.demo.domain.model.AttendanceInputDetail;
 import com.example.demo.domain.model.Holiday;
 import com.example.demo.repository.AttendanceMapper;
@@ -317,6 +318,25 @@ public class AttendanceInputServiceImpl
 		};
 	}
 
+	
+	/**
+	 * 差戻中の勤怠情報を取得する
+	 */
+	@Override
+	public AttendanceInputEntity getRejectedAttendance(
+			String email) {
+		
+		Long userId =
+				attendanceMapper.findUserIdByEmail(email);
+		
+		if (userId == null) {
+			throw new IllegalArgumentException("ログインユーザが見つかりません。");
+		}
+		
+		return attendanceMapper.findRejectedAttendance(userId);
+	}
+	
+	
 	/**
 	 * 勤怠区分コードを名称へ変換する
 	 */
