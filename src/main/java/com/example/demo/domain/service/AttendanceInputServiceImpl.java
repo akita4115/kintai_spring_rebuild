@@ -32,6 +32,9 @@ public class AttendanceInputServiceImpl
 
 	@Autowired
 	private AttendanceMapper attendanceMapper;
+	
+	@Autowired
+	private NationalHolidayService nationalHolidayService;
 
 	/**
 	 * 指定年月の勤怠入力一覧を取得
@@ -65,8 +68,14 @@ public class AttendanceInputServiceImpl
 				startDate,
 				endDate);
 
-		Map<LocalDate, String> holidayMap = new HashMap<>();
+		// 外部APIから国民の祝日を取得
+		Map<LocalDate, String> holidayMap =
+				new HashMap<>(
+						nationalHolidayService
+								.getNationalHolidays(
+										targetMonth));
 
+		// 祝日マスタの内容を追加
 		for (Holiday holiday : holidayList) {
 			holidayMap.put(
 					holiday.getYyyymmdd(),
