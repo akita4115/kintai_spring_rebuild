@@ -513,8 +513,8 @@ const AttendanceInput = () => {
                     key={attendance.attendanceDate}
                     className={getRowClassName(attendance)}
                   >
-                    <td className={getDateTextClassName(attendance)}>
-                      {attendance.attendanceDate.slice(8)}
+                    <td className={`text-center ${getDateTextClassName(attendance)}`}>
+                      {Number(attendance.attendanceDate.slice(8))}
                     </td>
 
                     <td className={getDateTextClassName(attendance)}>
