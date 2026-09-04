@@ -419,6 +419,21 @@ const AttendanceInput = () => {
         <div className="alert alert-success">{applyMessage}</div>
       )}
 
+      {/* 差戻情報 */}
+      {rejectedMonth && (
+        <div className="alert alert-danger">
+          <div>
+            差戻年月:
+            {rejectedMonth.substring(0, 4)}年{rejectedMonth.substring(4, 6)}月
+          </div>
+
+          <div>
+            差戻理由:
+            {rejectedReason || "理由なし"}
+          </div>
+        </div>
+      )}
+
       {/* 年月入力 */}
       <div className="card mb-4">
         <div className="card-header bg-light">入力</div>

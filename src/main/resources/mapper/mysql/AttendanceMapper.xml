@@ -52,7 +52,7 @@
 
 		SELECT
 		yyyymm AS rejectedMonth,
-		reject_comment AS rejectReason
+		reject_comment AS rejectedReason
 		FROM
 		attendance_heads
 		WHERE
