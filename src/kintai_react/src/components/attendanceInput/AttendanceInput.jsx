@@ -21,7 +21,7 @@ const AttendanceInput = () => {
   const [statusCd, setStatusCd] = useState(null);
 
   //差戻中の勤怠情報
-  const [rejectAttendanceList, setRejectedAttendanceList] = useState([]);
+  const [rejectedAttendanceList, setRejectedAttendanceList] = useState([]);
 
   // エラーメッセージ
   const [errorMessage, setErrorMessage] = useState("");
@@ -441,23 +441,24 @@ const AttendanceInput = () => {
       )}
 
       {/* 差戻情報 */}
-      {rejectedAttendanceList.map((rejectedAttendance) => (
-        <div
-          key={rejectedAttendance.rejectedMonth}
-          className="alert alert-danger"
-        >
-          <div>
-            差戻年月:
-            {rejectedAttendance.rejectedMonth.substring(0, 4)}年
-            {rejectedAttendance.rejectedMonth.substring(4, 6)}月
-          </div>
+      {rejectedAttendanceList.map((rejectedAttendance, index) => {
+        const rejectedMonth = rejectedAttendance.rejectedMonth ?? "";
 
-          <div>
-            差戻理由:
-            {rejectedAttendance.rejectedReason || "理由なし"}
+        return (
+          <div key={`${rejectedMonth}-${index}`} className="alert alert-danger">
+            <div>
+              差戻年月:
+              {rejectedAttendance.rejectedMonth.substring(0, 4)}年
+              {rejectedAttendance.rejectedMonth.substring(4, 6)}月
+            </div>
+
+            <div>
+              差戻理由:
+              {rejectedAttendance.rejectedReason || "理由なし"}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       {/* 年月入力 */}
       <div className="card mb-4">
