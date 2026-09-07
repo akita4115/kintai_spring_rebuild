@@ -366,41 +366,60 @@ const AttendanceInput = () => {
     setAttendanceList(updatedList);
   };
 
+
   /**
-   * 曜日による行の色
+   * 区分・曜日・祝日による行の背景色
    */
   const getRowClassName = (attendance) => {
-    if (attendance.holiday) {
-      return "table-danger";
-    }
+  //出勤１と休出４は働く日
+    const workKbnList = ["1", "4"];
 
+  //働く日は曜日に関係なく背景色を白
+    if (workKbnList.includes(attendance.kbn)) {
+      return "";
+    }
+  
+    //働かない日で祝日または日曜なら背景色を赤に
+    if (attendance.holiday || attendance.dayOfWeek === "日") {
+      return "table-danger";
+    } 
+
+    //働かない日で土曜なら背景色を青に
     if (attendance.dayOfWeek === "土") {
       return "table-info";
     }
 
-    if (attendance.dayOfWeek === "日") {
-      return "table-danger";
-    }
-
-    return "";
+    //平日の有給・欠勤・特休・代休・振休は背景色を赤に
+    return "table-danger";
   };
 
+
   /**
-   * 曜日・祝日による文字色
+   * 区分・曜日・祝日による文字色
    */
   const getDateTextClassName = (attendance) => {
-    // 国民の祝日・祝日マスタ・日曜日
+    // 出勤１と休出４は働く日
+    const workKbnList = ["1", "4"];
+
+    // 働く日は曜日に関係なく文字色を黒に
+    if (workKbnList.includes(attendance.kbn)) {
+      return "";
+    }
+
+    //働かない日で祝日または日曜なら文字色を赤に
     if (attendance.holiday || attendance.dayOfWeek === "日") {
       return "text-danger";
     }
 
-    // 土曜日
+    //働かない日で土曜なら文字色を青に
     if (attendance.dayOfWeek === "土") {
       return "text-primary";
     }
 
-    return "";
+    //平日の有給・欠勤・特休・代休・振休は文字色を赤に
+    return "text-danger";
   };
+
 
   return (
     <div className="container mt-4">
@@ -438,7 +457,7 @@ const AttendanceInput = () => {
       <div className="card mb-4">
         <div className="card-header bg-light">入力</div>
 
-        <div className="card-body">
+        <div className="card-body py-4">
           <div className="row align-items-end">
             <div className="col-md-4">
               <label className="form-label">年月:</label>
@@ -468,7 +487,7 @@ const AttendanceInput = () => {
       <div className="card">
         <div className="card-header bg-light">カレンダー</div>
 
-        <div className="card-body">
+        <div className="card-body py-4">
           {/* 保存・申請ボタン */}
           <div className="text-end mb-3">
             <button
@@ -503,7 +522,7 @@ const AttendanceInput = () => {
                   <th>夜休憩時間</th>
                   <th>勤務時間</th>
                   <th>残業時間</th>
-                  <th >備考</th>
+                  <th>備考</th>
                 </tr>
               </thead>
 
