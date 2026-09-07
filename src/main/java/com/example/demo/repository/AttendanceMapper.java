@@ -5,8 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.example.demo.domain.entity.AttendanceInputEntity;
 import com.example.demo.domain.model.AttendanceInputDetail;
+import com.example.demo.domain.model.RejectedAttendanceDetail;
 
 /**
  * 勤怠情報Mapper
@@ -63,8 +63,8 @@ public interface AttendanceMapper {
 			String status);
 	
 	
-	//差戻中の勤怠情報を取得する
-	public AttendanceInputEntity findRejectedAttendance(
+	//差戻中の勤怠情報をすべて取得する
+	public List<RejectedAttendanceDetail> findRejectedAttendances(
 			@Param("userId")
 			Long userId);
 	

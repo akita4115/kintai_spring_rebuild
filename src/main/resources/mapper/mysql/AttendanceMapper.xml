@@ -46,9 +46,9 @@
 	</select>
 
 
-	<!-- 差戻中の勤怠情報を取得 -->
-	<select id="findRejectedAttendance"
-		resultType="com.example.demo.domain.entity.AttendanceInputEntity">
+	<!-- 差戻中の勤怠情報をすべて取得 -->
+	<select id="findRejectedAttendances"
+		resultType="com.example.demo.domain.model.RejectedAttendanceDetail">
 
 		SELECT
 		yyyymm AS rejectedMonth,
@@ -59,8 +59,7 @@
 		user_id = #{userId}
 		AND status = '2'
 		ORDER BY
-		yyyymm DESC
-		LIMIT 1
+		yyyymm ASC
 
 	</select>
 

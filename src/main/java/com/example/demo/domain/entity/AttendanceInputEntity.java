@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.demo.domain.model.AttendanceInputDetail;
+import com.example.demo.domain.model.RejectedAttendanceDetail;
 
 import lombok.Data;
 
@@ -16,11 +17,8 @@ public class AttendanceInputEntity {
 	//申請状態
 	private String statusCd;
 
-	//差戻年月
-	private String rejectedMonth;
-
-	//差戻理由
-	private String rejectedReason;
+	//差戻中の勤怠情報
+	private List<RejectedAttendanceDetail> rejectedAttendanceList;
 
 	//一か月分の勤怠データ
 	private List<AttendanceInputDetail> attendanceList;

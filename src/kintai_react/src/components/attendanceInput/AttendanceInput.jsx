@@ -11,17 +11,17 @@ const AttendanceInput = () => {
   // 表示対象年月
   const [targetMonth, setTargetMonth] = useState(currentMonth);
 
+  //カレンダーに現在表示している年月
+  const [displayedMonth, setDisplayedMonth] = useState(currentMonth);
+
   // 勤怠一覧
   const [attendanceList, setAttendanceList] = useState([]);
 
   // 勤怠ステータス
   const [statusCd, setStatusCd] = useState(null);
 
-  //差戻年月
-  const [rejectedMonth, setRejectedMonth] = useState(null);
-
-  //差戻理由
-  const [rejectedReason, setRejectedReason] = useState("");
+  //差戻中の勤怠情報
+  const [rejectAttendanceList, setRejectedAttendanceList] = useState([]);
 
   // エラーメッセージ
   const [errorMessage, setErrorMessage] = useState("");
@@ -65,10 +65,10 @@ const AttendanceInput = () => {
   /**
    * 勤怠入力データを取得
    */
-  const getAttendanceList = async () => {
+  const getAttendanceList = async (month) => {
     try {
       const response = await fetch(
-        `/api/attendance/input?targetMonth=${encodeURIComponent(targetMonth)}`,
+        `/api/attendance/input?targetMonth=${encodeURIComponent(month)}`,
       );
 
       if (!response.ok) {
@@ -86,11 +86,16 @@ const AttendanceInput = () => {
 
       setAttendanceList(data.attendanceList ?? []);
 
+      //カレンダーに表示した年月を保持
+      setDisplayedMonth(data.targetMonth);
+
+      //年月選択欄も表示した年月に合わせる
+      setTargetMonth(data.targetMonth);
+
       setStatusCd(data.statusCd ?? null);
 
       //差戻情報
-      setRejectedMonth(data.rejectedMonth ?? null);
-      setRejectedReason(data.rejectedReason ?? "");
+      setRejectedAttendanceList(data.rejectedAttendanceList ?? []);
 
       setErrorMessage("");
     } catch (error) {
@@ -106,7 +111,7 @@ const AttendanceInput = () => {
    * 初回表示
    */
   useEffect(() => {
-    getAttendanceList();
+    getAttendanceList(currentMonth);
   }, []);
 
   /**
@@ -118,12 +123,12 @@ const AttendanceInput = () => {
 
     //年月未選択チェック
     if (!targetMonth) {
-      setErrorMessage("年月が選択されていません。");
+      setErrorMessage("年月が選択されていません");
       return;
     }
     setErrorMessage("");
 
-    getAttendanceList();
+    getAttendanceList(targetMonth);
   };
 
   //申請モーダルを開く
@@ -152,7 +157,7 @@ const AttendanceInput = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          targetMonth,
+          targetMonth: displayedMonth,
           attendanceList,
         }),
       });
@@ -174,7 +179,7 @@ const AttendanceInput = () => {
       setShowApplyModal(false);
 
       //勤怠一覧を再取得
-      await getAttendanceList();
+      await getAttendanceList(displayedMonth);
 
       //申請完了メッセージを表示
       setApplyMessage("申請が完了しました。");
@@ -196,7 +201,7 @@ const AttendanceInput = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          targetMonth,
+          targetMonth: displayedMonth,
           attendanceList,
         }),
       });
@@ -214,7 +219,7 @@ const AttendanceInput = () => {
         return;
       }
 
-      await getAttendanceList();
+      await getAttendanceList(displayedMonth);
 
       setSuccessMessage("保存が完了しました。");
     } catch (error) {
@@ -366,23 +371,22 @@ const AttendanceInput = () => {
     setAttendanceList(updatedList);
   };
 
-
   /**
    * 区分・曜日・祝日による行の背景色
    */
   const getRowClassName = (attendance) => {
-  //出勤１と休出４は働く日
+    //出勤１と休出４は働く日
     const workKbnList = ["1", "4"];
 
-  //働く日は曜日に関係なく背景色を白
+    //働く日は曜日に関係なく背景色を白
     if (workKbnList.includes(attendance.kbn)) {
       return "";
     }
-  
+
     //働かない日で祝日または日曜なら背景色を赤に
     if (attendance.holiday || attendance.dayOfWeek === "日") {
       return "table-danger";
-    } 
+    }
 
     //働かない日で土曜なら背景色を青に
     if (attendance.dayOfWeek === "土") {
@@ -392,7 +396,6 @@ const AttendanceInput = () => {
     //平日の有給・欠勤・特休・代休・振休は背景色を赤に
     return "table-danger";
   };
-
 
   /**
    * 区分・曜日・祝日による文字色
@@ -420,7 +423,6 @@ const AttendanceInput = () => {
     return "text-danger";
   };
 
-
   return (
     <div className="container mt-4">
       <h2 className="mb-3">勤怠入力</h2>
@@ -439,19 +441,23 @@ const AttendanceInput = () => {
       )}
 
       {/* 差戻情報 */}
-      {rejectedMonth && (
-        <div className="alert alert-danger">
+      {rejectedAttendanceList.map((rejectedAttendance) => (
+        <div
+          key={rejectedAttendance.rejectedMonth}
+          className="alert alert-danger"
+        >
           <div>
             差戻年月:
-            {rejectedMonth.substring(0, 4)}年{rejectedMonth.substring(4, 6)}月
+            {rejectedAttendance.rejectedMonth.substring(0, 4)}年
+            {rejectedAttendance.rejectedMonth.substring(4, 6)}月
           </div>
 
           <div>
             差戻理由:
-            {rejectedReason || "理由なし"}
+            {rejectedAttendance.rejectedReason || "理由なし"}
           </div>
         </div>
-      )}
+      ))}
 
       {/* 年月入力 */}
       <div className="card mb-4">
@@ -532,11 +538,15 @@ const AttendanceInput = () => {
                     key={attendance.attendanceDate}
                     className={getRowClassName(attendance)}
                   >
-                    <td className={`text-center ${getDateTextClassName(attendance)}`}>
+                    <td
+                      className={`text-center ${getDateTextClassName(attendance)}`}
+                    >
                       {Number(attendance.attendanceDate.slice(8))}
                     </td>
 
-                    <td className={`text-center ${getDateTextClassName(attendance)}`}>
+                    <td
+                      className={`text-center ${getDateTextClassName(attendance)}`}
+                    >
                       {attendance.dayOfWeek}
                     </td>
 

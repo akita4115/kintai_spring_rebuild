@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.domain.entity.AttendanceInputEntity;
 import com.example.demo.domain.model.AttendanceInputDetail;
+import com.example.demo.domain.model.RejectedAttendanceDetail;
 import com.example.demo.domain.service.AttendanceInputService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -72,17 +73,14 @@ public class AttendanceInputApiController {
 
 			attendanceInputEntity.setStatusCd(statusCd);
 			
-			//差戻中の勤怠情報を取得
-			AttendanceInputEntity rejectedAttendance = 
-					attendanceInputService.getRejectedAttendance(email);
+			//差戻中の勤怠情報をすべて取得
+			List<RejectedAttendanceDetail> rejectedAttendanceList = 
+					attendanceInputService.getRejectedAttendanceList(
+							email);
 			
-			if (rejectedAttendance != null) {
-				attendanceInputEntity.setRejectedMonth(
-						rejectedAttendance.getRejectedMonth());
-				
-				attendanceInputEntity.setRejectedReason(
-						rejectedAttendance.getRejectedReason());
-			}
+			//画面へ返すentityに差戻情報を設定
+			attendanceInputEntity.setRejectedAttendanceList(
+					rejectedAttendanceList);
 			
 			return attendanceInputEntity;
 			

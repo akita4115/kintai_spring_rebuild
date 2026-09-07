@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.domain.entity.AttendanceInputEntity;
 import com.example.demo.domain.model.AttendanceInputDetail;
 import com.example.demo.domain.model.Holiday;
+import com.example.demo.domain.model.RejectedAttendanceDetail;
 import com.example.demo.repository.AttendanceMapper;
 import com.example.demo.repository.HolidayMapper;
 
@@ -347,20 +347,22 @@ public class AttendanceInputServiceImpl
 
 	
 	/**
-	 * 差戻中の勤怠情報を取得する
+	 * 差戻中の勤怠情報をすべて取得する
 	 */
 	@Override
-	public AttendanceInputEntity getRejectedAttendance(
+	public List<RejectedAttendanceDetail> getRejectedAttendanceList(
 			String email) {
-		
+
 		Long userId =
 				attendanceMapper.findUserIdByEmail(email);
-		
+
 		if (userId == null) {
-			throw new IllegalArgumentException("ログインユーザが見つかりません。");
+			throw new IllegalArgumentException(
+					"ログインユーザが見つかりません。");
 		}
-		
-		return attendanceMapper.findRejectedAttendance(userId);
+
+		return attendanceMapper.findRejectedAttendances(
+				userId);
 	}
 	
 	
