@@ -455,9 +455,9 @@ const AttendanceInput = () => {
 
       {/* 年月入力 */}
       <div className="card mb-4">
-        <div className="card-header bg-light">入力</div>
+        <div className="card-header bg-light py-3 px-4">入力</div>
 
-        <div className="card-body py-4">
+        <div className="card-body py-4 px-4">
           <div className="row align-items-end">
             <div className="col-md-4">
               <label className="form-label">年月:</label>
@@ -485,7 +485,7 @@ const AttendanceInput = () => {
 
       {/* カレンダー */}
       <div className="card">
-        <div className="card-header bg-light">カレンダー</div>
+        <div className="card-header bg-light py-3 px-4">カレンダー</div>
 
         <div className="card-body py-4">
           {/* 保存・申請ボタン */}
