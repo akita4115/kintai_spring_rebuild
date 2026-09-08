@@ -28,10 +28,10 @@ public class AttendanceManageSearchForm {
     // 1ページ当たりの表示件数
     private int pageSize = 5;
     
-    /**
-     * SQLの検索開始位置を計算
-     */
+ 
+    //SQLの検索開始位置を計算
     public int getOffset() {
         return (page - 1) * pageSize;
     }
+    
 }

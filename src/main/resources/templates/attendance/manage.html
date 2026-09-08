@@ -1,17 +1,336 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}">
-
 
 <head>
 	<meta charset="UTF-8">
-	<title>勤怠管理画面</title>
+	<title>勤怠管理</title>
 </head>
 
 <body>
 
-	<h2>勤怠管理画面</h2>
+	<div layout:fragment="content">
+
+		<div class="container">
+
+			<h2 class="mb-3">勤怠管理</h2>
+
+			<!-- エラーメッセージ -->
+			<div id="attendanceErrorMessage" class="alert alert-danger"
+				th:classappend="${errorMessage == null} ? ' d-none' : ''" th:text="${errorMessage}">
+			</div>
+
+			<!-- 承認完了メッセージ -->
+			<div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}">
+			</div>
+
+			<!-- 検索条件 -->
+			<div class="card mb-4">
+
+				<div class="card-header bg-light py-3 px-4">
+					検索条件
+				</div>
+
+				<div class="card-body py-4 px-4">
+
+					<form th:action="@{/attendance/manage}" th:object="${attendanceManageSearchForm}" method="get">
+
+						<div class="row">
+
+							<!-- 年月 -->
+							<div class="col-md-3">
+
+								<label for="targetMonth" class="form-label">
+									年月:
+								</label>
+
+								<input type="month" id="targetMonth" class="form-control" th:field="*{targetMonth}">
+
+							</div>
+
+							<!-- 社員番号 -->
+							<div class="col-md-3">
+
+								<label for="employeeCode" class="form-label">
+									社員番号:
+								</label>
+
+								<input type="text" id="employeeCode" class="form-control" th:field="*{employeeCode}">
+
+							</div>
+
+							<!-- 社員名 -->
+							<div class="col-md-3">
+
+								<label for="employeeName" class="form-label">
+									社員名:
+								</label>
+
+								<input type="text" id="employeeName" class="form-control" th:field="*{employeeName}">
+
+							</div>
+
+							<!-- ステータス -->
+							<div class="col-md-3">
+
+								<label for="status" class="form-label">
+									ステータス:
+								</label>
+
+								<select id="status" class="form-select" th:field="*{status}">
+
+									<option value=""></option>
+									<option value="0">入力中</option>
+									<option value="1">申請中</option>
+									<option value="2">差戻中</option>
+									<option value="3">承認済</option>
+
+								</select>
+
+							</div>
+
+						</div>
+
+						<!-- 検索ボタン -->
+						<div class="d-flex justify-content-end mt-3">
+
+							<a th:href="@{/attendance/manage}" class="btn btn-warning me-2">
+								クリア
+							</a>
+
+							<button type="submit" class="btn btn-info">
+								検索
+							</button>
+
+						</div>
+
+					</form>
+
+				</div>
+
+			</div>
+
+			<!-- 検索結果 -->
+			<div class="card mb-4">
+
+				<div class="card-header bg-light py-3 px-4">
+					検索結果
+				</div>
+
+				<div class="card-body py-4 px-4">
+
+					<!-- 操作ボタン -->
+					<div class="d-flex justify-content-end mb-3">
+
+						<button type="button" id="approveButton" class="btn btn-success me-2">
+							承認
+						</button>
+
+						<button type="button" id="rejectButton" class="btn btn-danger me-2">
+							差戻
+						</button>
+
+						<button type="button" id="excelButton" class="btn btn-light border me-2">
+							Excel出力
+						</button>
+
+						<button type="button" id="pdfButton" class="btn btn-light border">
+							PDF出力
+						</button>
+
+					</div>
+
+					<!-- 勤怠一覧 -->
+					<div class="table-responsive">
+
+						<table class="table table-hover align-middle">
+
+							<thead class="table-dark">
+
+								<tr>
+									<th>#</th>
+									<th>年月</th>
+									<th>社員番号</th>
+									<th>社員名</th>
+									<th>ステータス</th>
+									<th>確認</th>
+								</tr>
+
+							</thead>
+
+							<tbody>
+
+								<tr th:each="attendance : ${attendanceManageList}">
+
+									<!-- 選択 -->
+									<td>
+
+										<input type="checkbox" class="attendance-checkbox"
+											th:value="${attendance.attendanceHeadId}"
+											th:data-status="${attendance.status}">
+
+									</td>
+
+									<!-- 年月 -->
+									<td th:text="${attendance.targetMonth}">
+									</td>
+
+									<!-- 社員番号 -->
+									<td th:text="${attendance.employeeCode}">
+									</td>
+
+									<!-- 社員名 -->
+									<td th:text="${attendance.employeeName}">
+									</td>
+
+									<!-- ステータス -->
+									<td th:text="${attendance.statusName}">
+									</td>
+
+									<!-- 確認 -->
+									<td>
+
+										<button type="button" class="btn btn-info confirm-button"
+											th:data-attendance-head-id="${attendance.attendanceHeadId}">
+											確認
+										</button>
+
+									</td>
+
+								</tr>
+
+							</tbody>
+
+						</table>
+
+					</div>
+
+					<!-- 検索結果なし -->
+					<div th:if="${#lists.isEmpty(attendanceManageList)}" class="alert alert-warning">
+
+						検索結果がありませんでした。
+
+					</div>
+
+					<!-- ページング -->
+					<nav th:if="${totalPages > 0}">
+
+						<ul class="pagination justify-content-center">
+
+							<!-- 前 -->
+							<li class="page-item" th:classappend="${attendanceManageSearchForm.page <= 1}
+                                ? ' disabled'
+                                : ''">
+
+								<a class="page-link" th:href="@{/attendance/manage(
+                                    page=${attendanceManageSearchForm.page - 1},
+                                    targetMonth=${attendanceManageSearchForm.targetMonth},
+                                    employeeCode=${attendanceManageSearchForm.employeeCode},
+                                    employeeName=${attendanceManageSearchForm.employeeName},
+                                    status=${attendanceManageSearchForm.status}
+                                )}">
+									前
+								</a>
+
+							</li>
+
+							<!-- ページ番号 -->
+							<li class="page-item" th:each="pageNo :
+                                ${#numbers.sequence(1, totalPages)}" th:classappend="${pageNo == attendanceManageSearchForm.page}
+                                ? ' active'
+                                : ''">
+
+								<a class="page-link" th:href="@{/attendance/manage(
+                                    page=${pageNo},
+                                    targetMonth=${attendanceManageSearchForm.targetMonth},
+                                    employeeCode=${attendanceManageSearchForm.employeeCode},
+                                    employeeName=${attendanceManageSearchForm.employeeName},
+                                    status=${attendanceManageSearchForm.status}
+                                )}" th:text="${pageNo}">
+								</a>
+
+							</li>
+
+							<!-- 次 -->
+							<li class="page-item" th:classappend="${attendanceManageSearchForm.page >= totalPages}
+                                ? ' disabled'
+                                : ''">
+
+								<a class="page-link" th:href="@{/attendance/manage(
+                                    page=${attendanceManageSearchForm.page + 1},
+                                    targetMonth=${attendanceManageSearchForm.targetMonth},
+                                    employeeCode=${attendanceManageSearchForm.employeeCode},
+                                    employeeName=${attendanceManageSearchForm.employeeName},
+                                    status=${attendanceManageSearchForm.status}
+                                )}">
+									次
+								</a>
+
+							</li>
+
+						</ul>
+
+					</nav>
+
+				</div>
+
+			</div>
+
+			<!-- 承認モーダル -->
+			<div class="modal fade" id="approveModal" tabindex="-1" aria-hidden="true">
+
+				<div class="modal-dialog">
+
+					<div class="modal-content">
+
+						<!-- ヘッダー -->
+						<div class="modal-header bg-info text-white">
+
+							<h5 class="modal-title fw-bold">
+								承認
+							</h5>
+
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる">
+							</button>
+
+						</div>
+
+						<!-- 本文 -->
+						<div class="modal-body py-4">
+
+							選択した勤怠の承認を行いますか？
+
+						</div>
+
+						<!-- フッター -->
+						<div class="modal-footer">
+
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+								キャンセル
+							</button>
+
+							<button type="button" id="confirmApproveButton" class="btn btn-success">
+								承認
+							</button>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+	<th:block layout:fragment="script">
+
+		<script th:src="@{/js/attendance-manage.js}">
+		</script>
+
+	</th:block>
 
 </body>
 

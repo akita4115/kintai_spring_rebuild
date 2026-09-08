@@ -81,5 +81,16 @@ public interface AttendanceMapper {
 	        AttendanceManageSearchForm searchForm);
 	
 	
+	//申請中以外の勤怠件数を取得
+	public int countNotPendingAttendances(
+			@Param("AttendanceHeadIds")
+			List<Long> attendanceHeadIds);
+	
+	
+	//選択された勤怠を承認済みへ更新
+	public int approveAttendances(
+			@Param("AttendanceHeadIds")
+			List<Long> attendanceHeadIds);
+	
 	
 }

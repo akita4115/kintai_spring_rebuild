@@ -41,4 +41,42 @@ public class AttendanceManageServiceImpl
         return attendanceMapper.countAttendanceManageList(
                 searchForm);
     }
+    
+
+     //選択された勤怠を承認する
+    @Override
+    public void approveAttendances(
+            List<Long> attendanceHeadIds) {
+
+        // 勤怠未選択
+        if (attendanceHeadIds == null
+                || attendanceHeadIds.isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "勤怠が選択されていません。");
+        }
+
+        // 申請中以外の勤怠が含まれているか確認
+        int notPendingCount =
+                attendanceMapper.countNotPendingAttendances(
+                        attendanceHeadIds);
+
+        if (notPendingCount > 0) {
+
+            throw new IllegalStateException(
+                    "申請中以外の勤怠は承認できません。");
+        }
+
+        // ステータスを承認済へ更新
+        int updatedCount =
+                attendanceMapper.approveAttendances(
+                        attendanceHeadIds);
+
+        // 選択件数と更新件数が一致しない場合
+        if (updatedCount != attendanceHeadIds.size()) {
+
+            throw new IllegalStateException(
+                    "勤怠の承認処理に失敗しました。");
+        }
+    }
 }

@@ -18,4 +18,10 @@ public interface AttendanceManageService {
 	public int getAttendanceManageCount(
 			AttendanceManageSearchForm searchForm);
 
+	
+    //選択された勤怠を承認する
+    public void approveAttendances(
+            List<Long> attendanceHeadIds);
+    
+    
 }

@@ -215,4 +215,31 @@
 	</select>
 
 
+	<!-- 選択された勤怠に申請中以外が含まれているか確認 -->
+	<select id="countNotPendingAttendances"
+		resultType="int"> SELECT COUNT(*) FROM attendance_heads WHERE id IN <foreach
+			collection="attendanceHeadIds"
+			item="attendanceHeadId"
+			open="("
+			separator=","
+			close=")">
+
+			#{attendanceHeadId}
+
+		</foreach> AND status != '1' </select>
+
+
+	<!-- 選択された勤怠を承認済へ更新 -->
+	<update id="approveAttendances"> UPDATE attendance_heads SET status = '3',
+		reject_comment = NULL, updated_at = CURRENT_TIMESTAMP WHERE id IN <foreach
+			collection="attendanceHeadIds"
+			item="attendanceHeadId"
+			open="("
+			separator=","
+			close=")">
+
+			#{attendanceHeadId}
+
+		</foreach> AND status = '1' </update>
+
 </mapper>
