@@ -31,15 +31,5 @@ public class HomeController {
 	}
 
 
-	/**
-	 * 勤怠管理画面
-	 */
-	@GetMapping("/attendance/manage")
-	public String getAttendanceManage(Model model) {
-		
-		//勤怠管理メニューをアクティブに
-				model.addAttribute("activePage", "attendanceManage");
 
-		return "attendance/manage";
-	}
 }

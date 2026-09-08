@@ -6,7 +6,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.example.demo.domain.model.AttendanceInputDetail;
+import com.example.demo.domain.model.AttendanceManage;
 import com.example.demo.domain.model.RejectedAttendanceDetail;
+import com.example.demo.form.AttendanceManageSearchForm;
 
 /**
  * 勤怠情報Mapper
@@ -69,7 +71,14 @@ public interface AttendanceMapper {
 			Long userId);
 	
 	
+	//勤怠管理画面の検索結果を取得
+	public List<AttendanceManage> findAttendanceManageList(
+			AttendanceManageSearchForm SearchForm);
 	
+	
+	//勤怠管理画面の検索結果件数を取得
+	public int countAttendanceManageList(
+	        AttendanceManageSearchForm searchForm);
 	
 	
 	

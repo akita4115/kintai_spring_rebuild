@@ -10,7 +10,7 @@ import lombok.Data;
 public class RejectedAttendanceDetail {
 
 	//差戻年月
-	private String RejectedMonth;
+	private String rejectedMonth;
 	
 	//差戻理由
 	private String rejectedReason;

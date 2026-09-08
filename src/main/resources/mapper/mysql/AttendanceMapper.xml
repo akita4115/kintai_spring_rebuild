@@ -49,7 +49,6 @@
 	<!-- 差戻中の勤怠情報をすべて取得 -->
 	<select id="findRejectedAttendances"
 		resultType="com.example.demo.domain.model.RejectedAttendanceDetail">
-
 		SELECT
 		yyyymm AS rejectedMonth,
 		reject_comment AS rejectedReason
@@ -158,5 +157,62 @@
 		</foreach>
 
 	</insert>
+
+
+	<!-- 勤怠管理画面の検索条件 -->
+	<sql id="attendanceManageSearchCondition">
+
+		<where>
+
+			<!-- 年月 -->
+			<if test="targetMonth != null and targetMonth != ''">
+				AND ah.yyyymm =
+				REPLACE(#{targetMonth}, '-', '')
+			</if>
+
+			<!-- 社員番号 -->
+			<if test="employeeCode != null and employeeCode != ''">
+				AND u.user_no LIKE
+				CONCAT(#{employeeCode}, '%')
+			</if>
+
+			<!-- 社員名 -->
+			<if test="employeeName != null and employeeName != ''">
+				AND u.name LIKE
+				CONCAT('%', #{employeeName}, '%')
+			</if>
+
+			<!-- ステータス -->
+			<if test="status != null and status != ''">
+				AND ah.status = #{status}
+			</if>
+
+		</where>
+
+	</sql>
+
+
+	<!-- 勤怠管理画面の一覧を取得 -->
+	<select id="findAttendanceManageList"
+		parameterType="com.example.demo.form.AttendanceManageSearchForm"
+		resultType="com.example.demo.domain.model.AttendanceManage"> SELECT
+		ah.id AS attendanceHeadId, ah.yyyymm AS targetMonth, u.user_no AS
+		employeeCode, u.name AS employeeName, ah.status, CASE ah.status WHEN '0'
+		THEN '入力中' WHEN '1' THEN '申請中' WHEN '2' THEN '差戻中' WHEN '3' THEN '承認済'
+		ELSE '' END AS statusName FROM attendance_heads ah INNER JOIN users u ON
+		u.id = ah.user_id <include refid="attendanceManageSearchCondition" />
+		ORDER BY ah.yyyymm DESC, u.user_no ASC LIMIT #{pageSize} OFFSET
+		#{offset} </select>
+
+
+	<!-- 勤怠管理画面の検索結果件数を取得 -->
+	<select id="countAttendanceManageList"
+		parameterType="com.example.demo.form.AttendanceManageSearchForm"
+		resultType="int"> SELECT COUNT(*) FROM attendance_heads ah INNER JOIN
+		users u ON u.id = ah.user_id <include
+			refid="attendanceManageSearchCondition" />
+
+	</select>
+
 
 </mapper>
