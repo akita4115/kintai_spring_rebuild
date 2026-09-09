@@ -448,9 +448,9 @@ const AttendanceInput = () => {
           <div key={`${rejectedMonth}-${index}`} className="alert alert-danger">
             <div>
               差戻年月:
-          {rejectedMonth
-          ? `${rejectedMonth.substring(0, 4)}年${rejectedMonth.substring(4, 6)}月`
-          : "年月不明"}
+              {rejectedMonth
+                ? `${rejectedMonth.substring(0, 4)}年${rejectedMonth.substring(4, 6)}月`
+                : "年月不明"}
             </div>
 
             <div>

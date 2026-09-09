@@ -83,13 +83,13 @@ public interface AttendanceMapper {
 	
 	//申請中以外の勤怠件数を取得
 	public int countNotPendingAttendances(
-			@Param("AttendanceHeadIds")
+			@Param("attendanceHeadIds")
 			List<Long> attendanceHeadIds);
 	
 	
 	//選択された勤怠を承認済みへ更新
 	public int approveAttendances(
-			@Param("AttendanceHeadIds")
+			@Param("attendanceHeadIds")
 			List<Long> attendanceHeadIds);
 	
 	

@@ -283,38 +283,60 @@
 
 					<div class="modal-content">
 
-						<!-- ヘッダー -->
-						<div class="modal-header bg-info text-white">
+						<form id="approveForm" th:action="@{/attendance/manage/approve}" method="post">
 
-							<h5 class="modal-title fw-bold">
-								承認
-							</h5>
+							<!-- 選択した勤怠IDの設定場所 -->
+							<div id="approveAttendanceIds">
+							</div>
 
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる">
-							</button>
+							<!-- 検索条件の引継ぎ -->
+							<input type="hidden" name="targetMonth"
+								th:value="${attendanceManageSearchForm.targetMonth}">
 
-						</div>
+							<input type="hidden" name="employeeCode"
+								th:value="${attendanceManageSearchForm.employeeCode}">
 
-						<!-- 本文 -->
-						<div class="modal-body py-4">
+							<input type="hidden" name="employeeName"
+								th:value="${attendanceManageSearchForm.employeeName}">
 
-							選択した勤怠の承認を行いますか？
+							<input type="hidden" name="status" th:value="${attendanceManageSearchForm.status}">
 
-						</div>
+							<input type="hidden" name="employeeName" th:value="${attendanceManageSearchForm.page}">
 
-						<!-- フッター -->
-						<div class="modal-footer">
 
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-								キャンセル
-							</button>
+							<!-- ヘッダー -->
+							<div class="modal-header bg-info text-white">
 
-							<button type="button" id="confirmApproveButton" class="btn btn-success">
-								承認
-							</button>
+								<h5 class="modal-title fw-bold">
+									承認
+								</h5>
 
-						</div>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる">
+								</button>
 
+							</div>
+
+							<!-- 本文 -->
+							<div class="modal-body py-4">
+
+								選択した勤怠の承認を行いますか？
+
+							</div>
+
+							<!-- フッター -->
+							<div class="modal-footer">
+
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+									キャンセル
+								</button>
+
+								<button type="submit" id="confirmApproveButton" class="btn btn-success">
+									承認
+								</button>
+
+							</div>
+
+						</form>
 					</div>
 
 				</div>

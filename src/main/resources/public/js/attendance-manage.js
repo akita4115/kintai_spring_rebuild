@@ -1,87 +1,102 @@
 "use strict";
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
 
-    // エラーメッセージ
-    const errorMessage =
-        document.getElementById("attendanceErrorMessage");
+	// エラーメッセージ
+	const errorMessage =
+		document.getElementById("attendanceErrorMessage");
 
-    // 承認ボタン
-    const approveButton =
-        document.getElementById("approveButton");
+	// 承認ボタン
+	const approveButton =
+		document.getElementById("approveButton");
 
-    // 承認モーダル
-    const approveModalElement =
-        document.getElementById("approveModal");
+	// 承認モーダル
+	const approveModalElement =
+		document.getElementById("approveModal");
 
-    const approveModal =
-        bootstrap.Modal.getOrCreateInstance(
-            approveModalElement
-        );
+	const approveModal =
+		bootstrap.Modal.getOrCreateInstance(
+			approveModalElement
+		);
 
-    /**
-     * 選択された勤怠IDを取得
-     */
-    const getSelectedAttendanceIds = function () {
+	/**
+	 * 選択された勤怠IDを取得
+	 */
+	const getSelectedAttendanceIds = function() {
 
-        const checkedElements =
-            document.querySelectorAll(
-                ".attendance-checkbox:checked"
-            );
+		const checkedElements =
+			document.querySelectorAll(
+				".attendance-checkbox:checked"
+			);
 
-        return Array.from(checkedElements).map(
-            function (checkbox) {
-                return checkbox.value;
-            }
-        );
-    };
+		const approveAttendanceIds =
+			document.getElementById("approveAttendanceIds");
 
-    /**
-     * エラーメッセージを表示
-     */
-    const showErrorMessage = function (message) {
+		return Array.from(checkedElements).map(
+			function(checkbox) {
+				return checkbox.value;
+			}
+		);
+	};
 
-        errorMessage.textContent = message;
-        errorMessage.classList.remove("d-none");
-    };
+	/**
+	 * エラーメッセージを表示
+	 */
+	const showErrorMessage = function(message) {
 
-    /**
-     * エラーメッセージを非表示
-     */
-    const clearErrorMessage = function () {
+		errorMessage.textContent = message;
+		errorMessage.classList.remove("d-none");
+	};
 
-        errorMessage.textContent = "";
-        errorMessage.classList.add("d-none");
-    };
+	/**
+	 * エラーメッセージを非表示
+	 */
+	const clearErrorMessage = function() {
 
-    /**
-     * 承認ボタン
-     */
-    approveButton.addEventListener(
-        "click",
-        function () {
+		errorMessage.textContent = "";
+		errorMessage.classList.add("d-none");
+	};
 
-            clearErrorMessage();
+	/**
+	 * 承認ボタン
+	 */
+	approveButton.addEventListener(
+		"click",
+		function() {
 
-            const selectedIds =
-                getSelectedAttendanceIds();
+			clearErrorMessage();
 
-            // 勤怠未選択
-            if (selectedIds.length === 0) {
+			const selectedIds =
+				getSelectedAttendanceIds();
 
-                showErrorMessage(
-                    "勤怠が選択されていません。"
-                );
+			// 勤怠未選択
+			if (selectedIds.length === 0) {
 
-                return;
-            }
+				showErrorMessage(
+					"勤怠が選択されていません。"
+				);
 
-            // 後の承認処理で利用するため保持
-            approveModalElement.dataset.selectedIds =
-                selectedIds.join(",");
+				return;
+			}
 
-            // 承認モーダルを表示
-            approveModal.show();
-        }
-    );
+			//前回設定したIDを削除
+			approveAttendanceIds.replaceChildren();
+
+			//選択したIDをhiddenへ設定
+			selectedIds.forEach(function(selectedId) {
+
+				const hiddenInput =
+					document.createElement("input");
+
+				hiddenInput.type = "hidden";
+				hiddenInput.name = "attendanceHeadIds";
+				hiddenInput.value = selectedId;
+
+				approveAttendanceIds.appendChild(hiddenInput);
+			});
+
+			// 承認モーダルを表示
+			approveModal.show();
+		}
+	);
 });
