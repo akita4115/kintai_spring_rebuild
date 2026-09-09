@@ -299,11 +299,9 @@
 							<input type="hidden" name="employeeName"
 								th:value="${attendanceManageSearchForm.employeeName}">
 
-							<input type="hidden" name="status" 
-								th:value="${attendanceManageSearchForm.status}">
+							<input type="hidden" name="status" th:value="${attendanceManageSearchForm.status}">
 
-							<input type="hidden" name="page" 
-								th:value="${attendanceManageSearchForm.page}">
+							<input type="hidden" name="page" th:value="${attendanceManageSearchForm.page}">
 
 
 							<!-- ヘッダー -->
@@ -339,6 +337,87 @@
 							</div>
 
 						</form>
+					</div>
+
+				</div>
+
+			</div>
+
+			<!-- 差戻モーダル -->
+			<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+
+				<div class="modal-dialog">
+
+					<div class="modal-content">
+
+						<form id="rejectForm" th:action="@{/attendance/manage/reject}" method="post">
+
+							<!-- 選択した勤怠IDの設定場所 -->
+							<div id="rejectAttendanceIds">
+							</div>
+
+							<!-- 検索条件を引き継ぐ -->
+							<input type="hidden" name="targetMonth"
+								th:value="${attendanceManageSearchForm.targetMonth}">
+
+							<input type="hidden" name="employeeCode"
+								th:value="${attendanceManageSearchForm.employeeCode}">
+
+							<input type="hidden" name="employeeName"
+								th:value="${attendanceManageSearchForm.employeeName}">
+
+							<input type="hidden" name="status" th:value="${attendanceManageSearchForm.status}">
+
+							<input type="hidden" name="page" th:value="${attendanceManageSearchForm.page}">
+
+							<!-- ヘッダー -->
+							<div class="modal-header bg-info text-white">
+
+								<h5 class="modal-title fw-bold">
+									差戻
+								</h5>
+
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる">
+								</button>
+
+							</div>
+
+							<!-- 本文 -->
+							<div class="modal-body py-4">
+
+								<p>
+									選択した勤怠の差戻を行いますか？
+								</p>
+
+								<label for="rejectReason" class="form-label">
+									差戻理由:
+								</label>
+
+								<textarea id="rejectReason" name="rejectReason" class="form-control"
+									rows="4"></textarea>
+
+								<!-- 理由未入力エラー -->
+								<div id="rejectReasonError" class="text-danger mt-2 d-none">
+									差戻理由を入力してください。
+								</div>
+
+							</div>
+
+							<!-- フッター -->
+							<div class="modal-footer">
+
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+									キャンセル
+								</button>
+
+								<button type="submit" class="btn btn-danger">
+									差戻
+								</button>
+
+							</div>
+
+						</form>
+
 					</div>
 
 				</div>

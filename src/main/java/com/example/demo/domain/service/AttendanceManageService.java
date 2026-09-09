@@ -24,4 +24,8 @@ public interface AttendanceManageService {
             List<Long> attendanceHeadIds);
     
     
+    //選択された勤怠を差戻する
+    public void rejectAttendances(
+    		List<Long> attendanceHeadIds,
+    		String rejectReason);
 }

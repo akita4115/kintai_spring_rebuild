@@ -108,7 +108,71 @@ public class AttendanceManageController {
 					ex.getMessage());
 		}
 
-		// 承認前の検索条件を引き継ぐ
+		setSearchCondition(
+				redirectAttributes,
+				targetMonth,
+				employeeCode,
+				employeeName,
+				status,
+				page);
+
+		return "redirect:/attendance/manage";
+	}
+
+	/**
+	 * 選択された勤怠を差戻
+	 */
+	@PostMapping("/reject")
+	public String postReject(
+			@RequestParam(required = false) List<Long> attendanceHeadIds,
+			@RequestParam(required = false) String rejectReason,
+			@RequestParam(required = false) String targetMonth,
+			@RequestParam(required = false) String employeeCode,
+			@RequestParam(required = false) String employeeName,
+			@RequestParam(required = false) String status,
+			@RequestParam(defaultValue = "1") int page,
+			RedirectAttributes redirectAttributes) {
+
+		try {
+
+			attendanceManageService.rejectAttendances(
+					attendanceHeadIds,
+					rejectReason);
+
+			redirectAttributes.addFlashAttribute(
+					"successMessage",
+					"差戻処理が完了しました。");
+
+		} catch (IllegalArgumentException
+				| IllegalStateException ex) {
+
+			redirectAttributes.addFlashAttribute(
+					"errorMessage",
+					ex.getMessage());
+		}
+
+		setSearchCondition(
+				redirectAttributes,
+				targetMonth,
+				employeeCode,
+				employeeName,
+				status,
+				page);
+
+		return "redirect:/attendance/manage";
+	}
+
+	/**
+	 * 処理前の検索条件を引き継ぐ
+	 */
+	private void setSearchCondition(
+			RedirectAttributes redirectAttributes,
+			String targetMonth,
+			String employeeCode,
+			String employeeName,
+			String status,
+			int page) {
+
 		redirectAttributes.addAttribute(
 				"targetMonth",
 				targetMonth);
@@ -128,7 +192,5 @@ public class AttendanceManageController {
 		redirectAttributes.addAttribute(
 				"page",
 				page);
-
-		return "redirect:/attendance/manage";
 	}
 }

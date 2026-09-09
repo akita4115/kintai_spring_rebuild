@@ -242,4 +242,19 @@
 
 		</foreach> AND status = '1' </update>
 
+
+	<!-- 選択された勤怠を差戻中へ更新 -->
+	<update id="rejectAttendances"> UPDATE attendance_heads SET status = '2',
+		reject_comment = #{rejectReason}, updated_at = CURRENT_TIMESTAMP WHERE
+		id IN <foreach
+			collection="attendanceHeadIds"
+			item="attendanceHeadId"
+			open="("
+			separator=","
+			close=")">
+
+			#{attendanceHeadId}
+
+		</foreach> AND status = '1' </update>
+
 </mapper>
