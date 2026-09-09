@@ -19,6 +19,9 @@ document.addEventListener("DOMContentLoaded", function() {
 			approveModalElement
 		);
 
+	const approveAttendanceIds =
+		document.getElementById("approveAttendanceIds");
+
 	/**
 	 * 選択された勤怠IDを取得
 	 */
@@ -28,9 +31,6 @@ document.addEventListener("DOMContentLoaded", function() {
 			document.querySelectorAll(
 				".attendance-checkbox:checked"
 			);
-
-		const approveAttendanceIds =
-			document.getElementById("approveAttendanceIds");
 
 		return Array.from(checkedElements).map(
 			function(checkbox) {
