@@ -1,203 +1,102 @@
 "use strict";
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 
-	// エラーメッセージ
-	const errorMessage =
-		document.getElementById("attendanceErrorMessage");
+    // エラーメッセージ
+    const errorMessage =
+        document.getElementById("attendanceErrorMessage");
 
-	// 承認ボタン
-	const approveButton =
-		document.getElementById("approveButton");
+    // 承認ボタン
+    const approveButton =
+        document.getElementById("approveButton");
 
-	// 承認モーダル
-	const approveModalElement =
-		document.getElementById("approveModal");
+    // 承認モーダル
+    const approveModalElement =
+        document.getElementById("approveModal");
 
-	const approveModal =
-		bootstrap.Modal.getOrCreateInstance(
-			approveModalElement
-		);
+    const approveModal =
+        bootstrap.Modal.getOrCreateInstance(
+            approveModalElement
+        );
 
-	const approveAttendanceIds =
-		document.getElementById("approveAttendanceIds");
+    /**
+     * 選択された勤怠IDを取得
+     */
+    const getSelectedAttendanceIds = function () {
 
-	// 差戻ボタン
-	const rejectButton =
-		document.getElementById("rejectButton");
+        const checkedElements =
+            document.querySelectorAll(
+                ".attendance-checkbox:checked"
+            );
 
-	// 差戻モーダル
-	const rejectModalElement =
-		document.getElementById("rejectModal");
+		const approveAttendanceIds = 
+			document.getElementById("approveAttendanceIds");
 
-	const rejectModal =
-		bootstrap.Modal.getOrCreateInstance(
-			rejectModalElement
-		);
+        return Array.from(checkedElements).map(
+            function (checkbox) {
+                return checkbox.value;
+            }
+        );
+    };
 
-	// 差戻対象IDの設定場所
-	const rejectAttendanceIds =
-		document.getElementById("rejectAttendanceIds");
+    /**
+     * エラーメッセージを表示
+     */
+    const showErrorMessage = function (message) {
 
-	// 差戻フォーム
-	const rejectForm =
-		document.getElementById("rejectForm");
+        errorMessage.textContent = message;
+        errorMessage.classList.remove("d-none");
+    };
 
-	// 差戻理由
-	const rejectReason =
-		document.getElementById("rejectReason");
+    /**
+     * エラーメッセージを非表示
+     */
+    const clearErrorMessage = function () {
 
-	// 差戻理由エラー
-	const rejectReasonError =
-		document.getElementById("rejectReasonError");
+        errorMessage.textContent = "";
+        errorMessage.classList.add("d-none");
+    };
 
-	/**
-	 * 選択された勤怠IDを取得
-	 */
-	const getSelectedAttendanceIds = function() {
+    /**
+     * 承認ボタン
+     */
+    approveButton.addEventListener(
+        "click",
+        function () {
 
-		const checkedElements =
-			document.querySelectorAll(
-				".attendance-checkbox:checked"
-			);
+            clearErrorMessage();
 
-		return Array.from(checkedElements).map(
-			function(checkbox) {
-				return checkbox.value;
-			}
-		);
-	};
+            const selectedIds =
+                getSelectedAttendanceIds();
 
-	/**
-	 * エラーメッセージを表示
-	 */
-	const showErrorMessage = function(message) {
+            // 勤怠未選択
+            if (selectedIds.length === 0) {
 
-		errorMessage.textContent = message;
-		errorMessage.classList.remove("d-none");
-	};
+                showErrorMessage(
+                    "勤怠が選択されていません。"
+                );
 
-	/**
-	 * エラーメッセージを非表示
-	 */
-	const clearErrorMessage = function() {
+                return;
+            }
 
-		errorMessage.textContent = "";
-		errorMessage.classList.add("d-none");
-	};
+//前回設定したIDを削除
+approveAttendanceIds.replaceChildren();
 
-	/**
-	 * 承認ボタン
-	 */
-	approveButton.addEventListener(
-		"click",
-		function() {
+//選択したIDをhiddenへ設定
+selectedIds.forEach(function (selectedId) {
 
-			clearErrorMessage();
+    const hiddenInput =
+        document.createElement("input");
 
-			const selectedIds =
-				getSelectedAttendanceIds();
+    hiddenInput.type = "hidden";
+    hiddenInput.name = "attendanceHeadIds";
+    hiddenInput.value = selectedId;
 
-			// 勤怠未選択
-			if (selectedIds.length === 0) {
+    approveAttendanceIds.appendChild(hiddenInput);
+});
 
-				showErrorMessage(
-					"勤怠が選択されていません。"
-				);
-
-				return;
-			}
-
-			//前回設定したIDを削除
-			approveAttendanceIds.replaceChildren();
-
-			//選択したIDをhiddenへ設定
-			selectedIds.forEach(function(selectedId) {
-
-				const hiddenInput =
-					document.createElement("input");
-
-				hiddenInput.type = "hidden";
-				hiddenInput.name = "attendanceHeadIds";
-				hiddenInput.value = selectedId;
-
-				approveAttendanceIds.appendChild(hiddenInput);
-			});
-
-			// 承認モーダルを表示
-			approveModal.show();
-		}
-	);
-
-	/**
- * 差戻ボタン
- */
-	rejectButton.addEventListener(
-		"click",
-		function() {
-
-			clearErrorMessage();
-
-			const selectedIds =
-				getSelectedAttendanceIds();
-
-			// 勤怠未選択
-			if (selectedIds.length === 0) {
-
-				showErrorMessage(
-					"勤怠が選択されていません。"
-				);
-
-				return;
-			}
-
-			// 前回の値を初期化
-			rejectAttendanceIds.replaceChildren();
-			rejectReason.value = "";
-			rejectReasonError.classList.add("d-none");
-
-			// 選択したIDをhiddenへ設定
-			selectedIds.forEach(function(selectedId) {
-
-				const hiddenInput =
-					document.createElement("input");
-
-				hiddenInput.type = "hidden";
-				hiddenInput.name = "attendanceHeadIds";
-				hiddenInput.value = selectedId;
-
-				rejectAttendanceIds.appendChild(
-					hiddenInput
-				);
-			});
-
-			// 差戻モーダルを表示
-			rejectModal.show();
-		}
-	);
-
-	/**
-	 * 差戻フォーム送信
-	 */
-	rejectForm.addEventListener(
-		"submit",
-		function(event) {
-
-			// 差戻理由が空欄
-			if (rejectReason.value.trim() === "") {
-
-				event.preventDefault();
-
-				rejectReasonError.classList.remove(
-					"d-none"
-				);
-
-				return;
-			}
-
-			rejectReasonError.classList.add(
-				"d-none"
-			);
-		}
-	);
+            // 承認モーダルを表示
+            approveModal.show();
+        }
+    );
 });

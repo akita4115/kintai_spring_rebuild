@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
@@ -16,20 +15,5 @@ public class HomeController {
 		// 勤怠入力画面へ遷移
 		return "redirect:/attendance/input";
 	}
-
-
-	/**
-	 * 勤怠入力画面
-	 */
-	@GetMapping("/attendance/input")
-	public String getAttendanceInput(Model model) {
-		
-		//勤怠入力メニューをアクティブに
-		model.addAttribute("activePage", "attendanceInput");
-
-		return "attendance/input";
-	}
-
-
 
 }

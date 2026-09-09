@@ -144,90 +144,97 @@ const AttendanceInput = () => {
     setShowApplyModal(false);
   };
 
-  //申請処理
-  const handleApply = async () => {
-    try {
-      setErrorMessage("");
-      setSuccessMessage("");
-      setApplyMessage("");
+/**
+ * 勤怠の保存・申請共通処理
+ */
+const executeAttendance = async (
+  action,
+  defaultErrorMessage,
+) => {
+  try {
+    setErrorMessage("");
+    setSuccessMessage("");
+    setApplyMessage("");
 
-      const response = await fetch("/api/attendance/input/apply", {
+    const response = await fetch(
+      `/api/attendance/input/${action}`,
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          // 入力欄ではなく、カレンダー表示中の年月
           targetMonth: displayedMonth,
           attendanceList,
         }),
-      });
+      },
+    );
 
-      const data = await response.json();
+    const data = await response.json();
 
-      // HTTPエラーまたはJava側の処理エラー
-      if (
-        !response.ok ||
-        (data.errors && Object.keys(data.errors).length > 0)
-      ) {
-        setErrorMessage(
-          data.errors ? Object.values(data.errors)[0] : "申請に失敗しました。",
-        );
-        return;
-      }
+    // HTTPエラーまたはJava側の処理エラー
+    if (
+      !response.ok ||
+      (data.errors &&
+        Object.keys(data.errors).length > 0)
+    ) {
+      setErrorMessage(
+        data.errors
+          ? Object.values(data.errors)[0]
+          : defaultErrorMessage,
+      );
 
-      //モーダルを閉じる
-      setShowApplyModal(false);
-
-      //勤怠一覧を再取得
-      await getAttendanceList(displayedMonth);
-
-      //申請完了メッセージを表示
-      setApplyMessage("申請が完了しました。");
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("申請に失敗しました。");
+      return false;
     }
-  };
+
+    // 処理した年月のカレンダーを再取得
+    await getAttendanceList(displayedMonth);
+
+    return true;
+  } catch (error) {
+    console.error(error);
+
+    setErrorMessage(defaultErrorMessage);
+
+    return false;
+  }
+};
+
+  //申請処理
+  const handleApply = async () => {
+  const isSuccess = await executeAttendance(
+    "apply",
+    "申請に失敗しました。",
+  );
+
+  if (!isSuccess) {
+    return;
+  }
+
+  // 成功した場合だけモーダルを閉じる
+  setShowApplyModal(false);
+
+  setApplyMessage(
+    "申請が完了しました。",
+  );
+};
 
   //保存ボタン
   const handleSave = async () => {
-    try {
-      setErrorMessage("");
-      setSuccessMessage("");
+  const isSuccess = await executeAttendance(
+    "save",
+    "保存に失敗しました。",
+  );
 
-      const response = await fetch("/api/attendance/input/save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          targetMonth: displayedMonth,
-          attendanceList,
-        }),
-      });
+  if (!isSuccess) {
+    return;
+  }
 
-      const data = await response.json();
-
-      //HTTPエラーまたはjava側の処理エラー
-      if (
-        !response.ok ||
-        (data.errors && Object.keys(data.errors).length > 0)
-      ) {
-        setErrorMessage(
-          data.errors ? Object.values(data.errors)[0] : "保存に失敗しました。",
-        );
-        return;
-      }
-
-      await getAttendanceList(displayedMonth);
-
-      setSuccessMessage("保存が完了しました。");
-    } catch (error) {
-      console.error(error);
-
-      setErrorMessage("保存に失敗しました。");
-    }
-  };
+  setSuccessMessage(
+    "保存が完了しました。",
+  );
+};
 
   /**
    * HH:mmを分へ変換
