@@ -32,7 +32,7 @@ public class AttendanceInputServiceImpl
 
 	@Autowired
 	private AttendanceMapper attendanceMapper;
-	
+
 	@Autowired
 	private NationalHolidayService nationalHolidayService;
 
@@ -40,7 +40,6 @@ public class AttendanceInputServiceImpl
 	 * 指定年月の勤怠入力一覧を取得
 	 */
 	@Override
-
 	public List<AttendanceInputDetail> getAttendanceList(
 			String email,
 			YearMonth targetMonth) {
@@ -55,54 +54,55 @@ public class AttendanceInputServiceImpl
 		String yyyymm = targetMonth.format(
 				DateTimeFormatter.ofPattern("yyyyMM"));
 
-		Long attendanceHeadId = attendanceMapper.findAttendanceHeadId(
-				userId,
-				yyyymm);
+		Long attendanceHeadId =
+				attendanceMapper.findAttendanceHeadId(userId, yyyymm);
 
-		// まず、祝日を取得する
+		// 祝日マスタから祝日を取得する
 		LocalDate startDate = targetMonth.atDay(1);
-
 		LocalDate endDate = targetMonth.atEndOfMonth();
 
-		List<Holiday> holidayList = holidayMapper.findByPeriod(
-				startDate,
-				endDate);
+		List<Holiday> holidayList =
+				holidayMapper.findByPeriod(startDate, endDate);
 
-		// 外部APIから国民の祝日を取得
+		// 外部APIから国民の祝日を取得する
 		Map<LocalDate, String> holidayMap =
 				new HashMap<>(
-						nationalHolidayService
-								.getNationalHolidays(
-										targetMonth));
+						nationalHolidayService.getNationalHolidays(
+								targetMonth));
 
-		// 祝日マスタの内容を追加
+		// 祝日マスタの内容を追加する
 		for (Holiday holiday : holidayList) {
 			holidayMap.put(
 					holiday.getYyyymmdd(),
 					holiday.getHolidayName());
 		}
 
-		// まず1か月分の初期値を作成する
-		List<AttendanceInputDetail> attendanceList = new ArrayList<>();
+		// 1か月分の初期値を作成する
+		List<AttendanceInputDetail> attendanceList =
+				new ArrayList<>();
 
-		for (int day = 1; day <= targetMonth.lengthOfMonth(); day++) {
+		for (int day = 1;
+				day <= targetMonth.lengthOfMonth();
+				day++) {
 
 			LocalDate date = targetMonth.atDay(day);
 
-			AttendanceInputDetail detail = new AttendanceInputDetail();
+			AttendanceInputDetail detail =
+					new AttendanceInputDetail();
 
-			detail.setAttendanceDate(
-					date.toString());
+			detail.setAttendanceDate(date.toString());
 
 			detail.setDayOfWeek(
-					getJapaneseDayOfWeek(
-							date.getDayOfWeek()));
+					getJapaneseDayOfWeek(date.getDayOfWeek()));
 
-			boolean isSaturday = date.getDayOfWeek() == DayOfWeek.SATURDAY;
+			boolean isSaturday =
+					date.getDayOfWeek() == DayOfWeek.SATURDAY;
 
-			boolean isSunday = date.getDayOfWeek() == DayOfWeek.SUNDAY;
+			boolean isSunday =
+					date.getDayOfWeek() == DayOfWeek.SUNDAY;
 
-			boolean isHoliday = holidayMap.containsKey(date);
+			boolean isHoliday =
+					holidayMap.containsKey(date);
 
 			detail.setHoliday(isHoliday);
 
@@ -132,50 +132,55 @@ public class AttendanceInputServiceImpl
 			}
 
 			detail.setRemarks(
-					holidayMap.getOrDefault(
-							date,
-							""));
+					holidayMap.getOrDefault(date, ""));
 
 			attendanceList.add(detail);
 		}
 
-		// DBに保存済みの明細があれば、初期値へ上書きする
+		// DBに保存済みの明細があれば初期値へ上書きする
 		if (attendanceHeadId != null) {
 
-			List<AttendanceInputDetail> savedList = attendanceMapper.findAttendanceDetails(
-					attendanceHeadId);
+			List<AttendanceInputDetail> savedList =
+					attendanceMapper.findAttendanceDetails(
+							attendanceHeadId);
 
-			for (AttendanceInputDetail savedDetail : savedList) {
+			for (AttendanceInputDetail savedDetail
+					: savedList) {
 
 				int day = Integer.parseInt(
 						savedDetail.getAttendanceDate());
 
-				AttendanceInputDetail detail = attendanceList.get(day - 1);
+				AttendanceInputDetail detail =
+						attendanceList.get(day - 1);
 
 				detail.setKbn(savedDetail.getKbn());
+
 				detail.setAttendanceType(
-						getAttendanceType(
-								savedDetail.getKbn()));
+						getAttendanceType(savedDetail.getKbn()));
+
 				detail.setStartTime(
 						savedDetail.getStartTime());
+
 				detail.setEndTime(
 						savedDetail.getEndTime());
+
 				detail.setBreakTime(
 						savedDetail.getBreakTime());
+
 				detail.setNightBreakTime(
 						savedDetail.getNightBreakTime());
+
 				detail.setWorkTime(
 						savedDetail.getWorkTime());
+
 				detail.setOverTime(
 						savedDetail.getOverTime());
 
-				// 保存済みの備考が空欄でない場合のみ上書き
-				if (savedDetail.getRemarks() != null
-						&& !savedDetail.getRemarks().isBlank()) {
-
-					detail.setRemarks(
-							savedDetail.getRemarks());
-				}
+				// 保存済みの備考で上書きする
+				detail.setRemarks(
+						savedDetail.getRemarks() == null
+								? ""
+								: savedDetail.getRemarks());
 			}
 		}
 
@@ -195,17 +200,14 @@ public class AttendanceInputServiceImpl
 
 		if (userId == null) {
 			throw new IllegalArgumentException(
-					"ログインユーザが見つかりません。");
+					"ログインユーザーが見つかりません。");
 		}
 
 		String yyyymm = targetMonth.format(
-				DateTimeFormatter.ofPattern(
-						"yyyyMM"));
+				DateTimeFormatter.ofPattern("yyyyMM"));
 
 		Long attendanceHeadId =
-				attendanceMapper.findAttendanceHeadId(
-						userId,
-						yyyymm);
+				attendanceMapper.findAttendanceHeadId(userId, yyyymm);
 
 		// 申請中・承認済みの勤怠は変更不可
 		if (attendanceHeadId != null) {
@@ -225,15 +227,11 @@ public class AttendanceInputServiceImpl
 		// 勤怠ヘッダーが未登録の場合
 		if (attendanceHeadId == null) {
 
-			attendanceMapper.insertAttendanceHead(
-					userId,
-					yyyymm,
-					"0");
+			attendanceMapper.insertAttendanceHead(userId, yyyymm, "0");
 
 			attendanceHeadId =
 					attendanceMapper.findAttendanceHeadId(
-							userId,
-							yyyymm);
+							userId, yyyymm);
 		}
 
 		if (attendanceHeadId == null) {
@@ -241,15 +239,15 @@ public class AttendanceInputServiceImpl
 					"勤怠ヘッダーの登録に失敗しました。");
 		}
 
-		attendanceMapper.deleteAttendanceDetails(
-				attendanceHeadId);
+		// 登録済みの勤怠明細を削除する
+		attendanceMapper.deleteAttendanceDetails(attendanceHeadId);
 
+		// 画面から受け取った勤怠明細を登録する
 		if (attendanceList != null
 				&& !attendanceList.isEmpty()) {
 
 			attendanceMapper.insertAttendanceDetails(
-					attendanceHeadId,
-					attendanceList);
+					attendanceHeadId, attendanceList);
 		}
 	}
 
@@ -262,43 +260,35 @@ public class AttendanceInputServiceImpl
 			YearMonth targetMonth,
 			List<AttendanceInputDetail> attendanceList) {
 
-		// 入力中の勤怠情報を保存する
-		saveAttendance(
-				email,
-				targetMonth,
-				attendanceList);
+		// 保存処理を共通利用する
+		saveAttendance(email, targetMonth, attendanceList);
 
-		// メールアドレスからユーザーIDを取得
-		Long userId = attendanceMapper.findUserIdByEmail(
-				email);
+		Long userId = attendanceMapper.findUserIdByEmail(email);
 
 		if (userId == null) {
 			throw new IllegalArgumentException(
 					"ログインユーザーが見つかりません。");
 		}
 
-		// 年月をyyyyMM形式へ変換
 		String yyyymm = targetMonth.format(
-				DateTimeFormatter.ofPattern(
-						"yyyyMM"));
+				DateTimeFormatter.ofPattern("yyyyMM"));
 
-		// 勤怠ヘッダーIDを取得
-		Long attendanceHeadId = attendanceMapper.findAttendanceHeadId(
-				userId,
-				yyyymm);
+		Long attendanceHeadId =
+				attendanceMapper.findAttendanceHeadId(userId, yyyymm);
 
 		if (attendanceHeadId == null) {
 			throw new IllegalStateException(
 					"勤怠ヘッダーが見つかりません。");
 		}
 
-		// ステータスを申請中へ変更
+		// 申請固有処理：ステータスを申請中へ変更する
 		attendanceMapper.updateAttendanceStatus(
-				attendanceHeadId,
-				"1");
+				attendanceHeadId, "1");
 	}
 
-	//指定年月の勤怠ステータスを取得する
+	/**
+	 * 指定年月の勤怠ステータスを取得する
+	 */
 	@Override
 	public String getAttendanceStatus(
 			String email,
@@ -312,12 +302,10 @@ public class AttendanceInputServiceImpl
 		}
 
 		String yyyymm = targetMonth.format(
-				DateTimeFormatter.ofPattern(
-						"yyyyMM"));
+				DateTimeFormatter.ofPattern("yyyyMM"));
 
-		Long attendanceHeadId = attendanceMapper.findAttendanceHeadId(
-				userId,
-				yyyymm);
+		Long attendanceHeadId =
+				attendanceMapper.findAttendanceHeadId(userId, yyyymm);
 
 		// 未保存の場合はステータスなし
 		if (attendanceHeadId == null) {
@@ -329,7 +317,24 @@ public class AttendanceInputServiceImpl
 	}
 
 	/**
-	 * 曜日を日本語へ変換
+	 * 差戻中の勤怠情報をすべて取得する
+	 */
+	@Override
+	public List<RejectedAttendanceDetail> getRejectedAttendanceList(
+			String email) {
+
+		Long userId = attendanceMapper.findUserIdByEmail(email);
+
+		if (userId == null) {
+			throw new IllegalArgumentException(
+					"ログインユーザーが見つかりません。");
+		}
+
+		return attendanceMapper.findRejectedAttendances(userId);
+	}
+
+	/**
+	 * 曜日を日本語へ変換する
 	 */
 	private String getJapaneseDayOfWeek(
 			DayOfWeek dayOfWeek) {
@@ -345,27 +350,6 @@ public class AttendanceInputServiceImpl
 		};
 	}
 
-	
-	/**
-	 * 差戻中の勤怠情報をすべて取得する
-	 */
-	@Override
-	public List<RejectedAttendanceDetail> getRejectedAttendanceList(
-			String email) {
-
-		Long userId =
-				attendanceMapper.findUserIdByEmail(email);
-
-		if (userId == null) {
-			throw new IllegalArgumentException(
-					"ログインユーザが見つかりません。");
-		}
-
-		return attendanceMapper.findRejectedAttendances(
-				userId);
-	}
-	
-	
 	/**
 	 * 勤怠区分コードを名称へ変換する
 	 */

@@ -14,6 +14,9 @@ const AttendanceInput = () => {
   //カレンダーに現在表示している年月
   const [displayedMonth, setDisplayedMonth] = useState(currentMonth);
 
+  //カレンダー表示状態
+  const [showCalendar, setShowCalendar] = useState(true);
+
   // 勤怠一覧
   const [attendanceList, setAttendanceList] = useState([]);
 
@@ -37,6 +40,16 @@ const AttendanceInput = () => {
 
   //編集不可状態
   const isLocked = statusCd === "1" || statusCd === "3";
+
+  //時刻欄を変更できないか判定
+  const isTimeInputDisabled = (attendance) => {
+    //申請中・認証済みは変更不可
+    if (isLocked) {
+      return true;
+    }
+    //出勤・休出のみ時刻変更可能
+    return !["1", "4"].includes(attendance.kbn);
+  };
 
   //日ごとの勤怠区分選択肢
   const getkbnOptions = (attendance) => {
@@ -86,6 +99,9 @@ const AttendanceInput = () => {
 
       setAttendanceList(data.attendanceList ?? []);
 
+      //カレンダーを表示
+      setShowCalendar(true);
+
       //カレンダーに表示した年月を保持
       setDisplayedMonth(data.targetMonth);
 
@@ -124,6 +140,10 @@ const AttendanceInput = () => {
     //年月未選択チェック
     if (!targetMonth) {
       setErrorMessage("年月が選択されていません");
+
+      //カレンダーを非表示
+      setShowCalendar(false);
+
       return;
     }
     setErrorMessage("");
@@ -144,21 +164,16 @@ const AttendanceInput = () => {
     setShowApplyModal(false);
   };
 
-/**
- * 勤怠の保存・申請共通処理
- */
-const executeAttendance = async (
-  action,
-  defaultErrorMessage,
-) => {
-  try {
-    setErrorMessage("");
-    setSuccessMessage("");
-    setApplyMessage("");
+  /**
+   * 勤怠の保存・申請共通処理
+   */
+  const executeAttendance = async (action, defaultErrorMessage) => {
+    try {
+      setErrorMessage("");
+      setSuccessMessage("");
+      setApplyMessage("");
 
-    const response = await fetch(
-      `/api/attendance/input/${action}`,
-      {
+      const response = await fetch(`/api/attendance/input/${action}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -168,73 +183,59 @@ const executeAttendance = async (
           targetMonth: displayedMonth,
           attendanceList,
         }),
-      },
-    );
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    // HTTPエラーまたはJava側の処理エラー
-    if (
-      !response.ok ||
-      (data.errors &&
-        Object.keys(data.errors).length > 0)
-    ) {
-      setErrorMessage(
-        data.errors
-          ? Object.values(data.errors)[0]
-          : defaultErrorMessage,
-      );
+      // HTTPエラーまたはJava側の処理エラー
+      if (
+        !response.ok ||
+        (data.errors && Object.keys(data.errors).length > 0)
+      ) {
+        setErrorMessage(
+          data.errors ? Object.values(data.errors)[0] : defaultErrorMessage,
+        );
+
+        return false;
+      }
+
+      // 処理した年月のカレンダーを再取得
+      await getAttendanceList(displayedMonth);
+
+      return true;
+    } catch (error) {
+      console.error(error);
+
+      setErrorMessage(defaultErrorMessage);
 
       return false;
     }
-
-    // 処理した年月のカレンダーを再取得
-    await getAttendanceList(displayedMonth);
-
-    return true;
-  } catch (error) {
-    console.error(error);
-
-    setErrorMessage(defaultErrorMessage);
-
-    return false;
-  }
-};
+  };
 
   //申請処理
   const handleApply = async () => {
-  const isSuccess = await executeAttendance(
-    "apply",
-    "申請に失敗しました。",
-  );
+    const isSuccess = await executeAttendance("apply", "申請に失敗しました。");
 
-  if (!isSuccess) {
-    return;
-  }
+    if (!isSuccess) {
+      return;
+    }
 
-  // 成功した場合だけモーダルを閉じる
-  setShowApplyModal(false);
+    // 成功した場合だけモーダルを閉じる
+    setShowApplyModal(false);
 
-  setApplyMessage(
-    "申請が完了しました。",
-  );
-};
+    setApplyMessage("申請が完了しました。");
+  };
 
   //保存ボタン
   const handleSave = async () => {
-  const isSuccess = await executeAttendance(
-    "save",
-    "保存に失敗しました。",
-  );
+    const isSuccess = await executeAttendance("save", "保存に失敗しました。");
 
-  if (!isSuccess) {
-    return;
-  }
+    if (!isSuccess) {
+      return;
+    }
 
-  setSuccessMessage(
-    "保存が完了しました。",
-  );
-};
+    setSuccessMessage("保存が完了しました。");
+  };
 
   /**
    * HH:mmを分へ変換
@@ -499,193 +500,199 @@ const executeAttendance = async (
       </div>
 
       {/* カレンダー */}
-      <div className="card">
-        <div className="card-header bg-light py-3 px-4">カレンダー</div>
+      {showCalendar && (
+        <div className="card">
+          <div className="card-header bg-light py-3 px-4">カレンダー</div>
 
-        <div className="card-body py-4">
-          {/* 保存・申請ボタン */}
-          <div className="text-end mb-3">
-            <button
-              type="button"
-              className="btn btn-primary me-2"
-              onClick={handleSave}
-              disabled={isLocked}
-            >
-              保存
-            </button>
+          <div className="card-body py-4">
+            {/* 保存・申請ボタン */}
+            <div className="text-end mb-3">
+              <button
+                type="button"
+                className="btn btn-primary me-2"
+                onClick={handleSave}
+                disabled={isLocked}
+              >
+                保存
+              </button>
 
-            <button
-              type="button"
-              className="btn btn-success"
-              onClick={handleOpenApplyModal}
-              disabled={isLocked}
-            >
-              申請
-            </button>
-          </div>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={handleOpenApplyModal}
+                disabled={isLocked}
+              >
+                申請
+              </button>
+            </div>
 
-          <div className="table-responsive">
-            <table className="table table-hover align-middle">
-              <thead className="table-dark">
-                <tr>
-                  <th>日</th>
-                  <th>曜日</th>
-                  <th>区分</th>
-                  <th>開始時刻</th>
-                  <th>終了時刻</th>
-                  <th>昼休憩時間</th>
-                  <th>夜休憩時間</th>
-                  <th>勤務時間</th>
-                  <th>残業時間</th>
-                  <th>備考</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {attendanceList.map((attendance, index) => (
-                  <tr
-                    key={attendance.attendanceDate}
-                    className={getRowClassName(attendance)}
-                  >
-                    <td
-                      className={`text-center ${getDateTextClassName(attendance)}`}
-                    >
-                      {Number(attendance.attendanceDate.slice(8))}
-                    </td>
-
-                    <td
-                      className={`text-center ${getDateTextClassName(attendance)}`}
-                    >
-                      {attendance.dayOfWeek}
-                    </td>
-
-                    <td>
-                      <select
-                        className="form-select"
-                        value={attendance.kbn}
-                        disabled={isLocked}
-                        onChange={(event) =>
-                          handleAttendanceChange(
-                            index,
-                            "kbn",
-                            event.target.value,
-                          )
-                        }
-                      >
-                        {getkbnOptions(attendance).map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-
-                    <td>
-                      <input
-                        type="time"
-                        className="form-control"
-                        value={attendance.startTime}
-                        disabled={isLocked}
-                        onChange={(event) =>
-                          handleAttendanceChange(
-                            index,
-                            "startTime",
-                            event.target.value,
-                          )
-                        }
-                      />
-                    </td>
-
-                    <td>
-                      <input
-                        type="time"
-                        className="form-control"
-                        value={attendance.endTime}
-                        disabled={isLocked}
-                        onChange={(event) =>
-                          handleAttendanceChange(
-                            index,
-                            "endTime",
-                            event.target.value,
-                          )
-                        }
-                      />
-                    </td>
-
-                    <td>
-                      <input
-                        type="time"
-                        className="form-control"
-                        value={attendance.breakTime}
-                        disabled={isLocked}
-                        onChange={(event) =>
-                          handleAttendanceChange(
-                            index,
-                            "breakTime",
-                            event.target.value,
-                          )
-                        }
-                      />
-                    </td>
-
-                    <td>
-                      <input
-                        type="time"
-                        className="form-control"
-                        value={attendance.nightBreakTime}
-                        disabled={isLocked}
-                        onChange={(event) =>
-                          handleAttendanceChange(
-                            index,
-                            "nightBreakTime",
-                            event.target.value,
-                          )
-                        }
-                      />
-                    </td>
-
-                    <td>
-                      <input
-                        type="time"
-                        className="form-control"
-                        value={attendance.workTime}
-                        disabled={isLocked}
-                        readOnly
-                      />
-                    </td>
-
-                    <td>
-                      <input
-                        type="time"
-                        className="form-control"
-                        value={attendance.overTime}
-                        disabled={isLocked}
-                        readOnly
-                      />
-                    </td>
-
-                    <td>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={attendance.remarks}
-                        disabled={isLocked}
-                        onChange={(event) =>
-                          handleAttendanceChange(
-                            index,
-                            "remarks",
-                            event.target.value,
-                          )
-                        }
-                      />
-                    </td>
+            <div className="table-responsive">
+              <table className="table table-hover align-middle">
+                <thead className="table-dark">
+                  <tr>
+                    <th>日</th>
+                    <th>曜日</th>
+                    <th>区分</th>
+                    <th>開始時刻</th>
+                    <th>終了時刻</th>
+                    <th>昼休憩時間</th>
+                    <th>夜休憩時間</th>
+                    <th>勤務時間</th>
+                    <th>残業時間</th>
+                    <th>備考</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {attendanceList.map((attendance, index) => (
+                    <tr
+                      key={attendance.attendanceDate}
+                      className={getRowClassName(attendance)}
+                    >
+                      <td
+                        className={`text-center ${getDateTextClassName(attendance)}`}
+                      >
+                        {Number(attendance.attendanceDate.slice(8))}
+                      </td>
+
+                      <td
+                        className={`text-center ${getDateTextClassName(attendance)}`}
+                      >
+                        {attendance.dayOfWeek}
+                      </td>
+
+                      <td>
+                        <select
+                          className="form-select"
+                          value={attendance.kbn}
+                          disabled={isLocked}
+                          onChange={(event) =>
+                            handleAttendanceChange(
+                              index,
+                              "kbn",
+                              event.target.value,
+                            )
+                          }
+                        >
+                          {getkbnOptions(attendance).map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+
+                      <td>
+                        <input
+                          type="time"
+                          className="form-control"
+                          value={attendance.startTime}
+                          disabled={isLocked}
+                          readOnly={isTimeInputDisabled(attendance)}
+                          onChange={(event) =>
+                            handleAttendanceChange(
+                              index,
+                              "startTime",
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          type="time"
+                          className="form-control"
+                          value={attendance.endTime}
+                          disabled={isLocked}
+                          readOnly={isTimeInputDisabled(attendance)}
+                          onChange={(event) =>
+                            handleAttendanceChange(
+                              index,
+                              "endTime",
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          type="time"
+                          className="form-control"
+                          value={attendance.breakTime}
+                          disabled={isLocked}
+                          readOnly={isTimeInputDisabled(attendance)}
+                          onChange={(event) =>
+                            handleAttendanceChange(
+                              index,
+                              "breakTime",
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          type="time"
+                          className="form-control"
+                          value={attendance.nightBreakTime}
+                          disabled={isLocked}
+                          readOnly={isTimeInputDisabled(attendance)}
+                          onChange={(event) =>
+                            handleAttendanceChange(
+                              index,
+                              "nightBreakTime",
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          type="time"
+                          className="form-control"
+                          value={attendance.workTime}
+                          disabled={isLocked}
+                          readOnly
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          type="time"
+                          className="form-control"
+                          value={attendance.overTime}
+                          disabled={isLocked}
+                          readOnly
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={attendance.remarks}
+                          disabled={isLocked}
+                          onChange={(event) =>
+                            handleAttendanceChange(
+                              index,
+                              "remarks",
+                              event.target.value,
+                            )
+                          }
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* 申請確認モーダル*/}
       {showApplyModal && (
