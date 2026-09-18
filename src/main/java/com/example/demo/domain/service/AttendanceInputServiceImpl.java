@@ -249,6 +249,11 @@ public class AttendanceInputServiceImpl
 			attendanceMapper.insertAttendanceDetails(
 					attendanceHeadId, attendanceList);
 		}
+		
+		// 勤怠ヘッダーの更新日時を更新する
+		attendanceMapper.updateAttendanceHeadUpdatedAt(
+		        attendanceHeadId);
+		
 	}
 
 	/**

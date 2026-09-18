@@ -257,4 +257,13 @@
 
 		</foreach> AND status = '1' </update>
 
+
+	<!-- 勤怠ヘッダーの更新日時を更新する -->
+	<update id="updateAttendanceHeadUpdatedAt">
+		UPDATE attendance_heads
+		SET updated_at = CURRENT_TIMESTAMP
+		WHERE id = #{attendanceHeadId}
+</update>
+
+
 </mapper>

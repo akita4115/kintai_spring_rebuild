@@ -77,5 +77,10 @@ public interface AttendanceMapper {
 	public int rejectAttendances(
 			@Param("attendanceHeadIds") List<Long> attendanceHeadIds,
 			@Param("rejectReason") String rejectReason);
-			
+	
+	//勤怠ヘッダーの更新日時を更新する
+	
+	void updateAttendanceHeadUpdatedAt(
+	        @Param("attendanceHeadId") Long attendanceHeadId);
+	
 }
