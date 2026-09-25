@@ -54,21 +54,18 @@ public class AttendanceInputServiceImpl
 		String yyyymm = targetMonth.format(
 				DateTimeFormatter.ofPattern("yyyyMM"));
 
-		Long attendanceHeadId =
-				attendanceMapper.findAttendanceHeadId(userId, yyyymm);
+		Long attendanceHeadId = attendanceMapper.findAttendanceHeadId(userId, yyyymm);
 
 		// 祝日マスタから祝日を取得する
 		LocalDate startDate = targetMonth.atDay(1);
 		LocalDate endDate = targetMonth.atEndOfMonth();
 
-		List<Holiday> holidayList =
-				holidayMapper.findByPeriod(startDate, endDate);
+		List<Holiday> holidayList = holidayMapper.findByPeriod(startDate, endDate);
 
 		// 外部APIから国民の祝日を取得する
-		Map<LocalDate, String> holidayMap =
-				new HashMap<>(
-						nationalHolidayService.getNationalHolidays(
-								targetMonth));
+		Map<LocalDate, String> holidayMap = new HashMap<>(
+				nationalHolidayService.getNationalHolidays(
+						targetMonth));
 
 		// 祝日マスタの内容を追加する
 		for (Holiday holiday : holidayList) {
@@ -78,31 +75,24 @@ public class AttendanceInputServiceImpl
 		}
 
 		// 1か月分の初期値を作成する
-		List<AttendanceInputDetail> attendanceList =
-				new ArrayList<>();
+		List<AttendanceInputDetail> attendanceList = new ArrayList<>();
 
-		for (int day = 1;
-				day <= targetMonth.lengthOfMonth();
-				day++) {
+		for (int day = 1; day <= targetMonth.lengthOfMonth(); day++) {
 
 			LocalDate date = targetMonth.atDay(day);
 
-			AttendanceInputDetail detail =
-					new AttendanceInputDetail();
+			AttendanceInputDetail detail = new AttendanceInputDetail();
 
 			detail.setAttendanceDate(date.toString());
 
 			detail.setDayOfWeek(
 					getJapaneseDayOfWeek(date.getDayOfWeek()));
 
-			boolean isSaturday =
-					date.getDayOfWeek() == DayOfWeek.SATURDAY;
+			boolean isSaturday = date.getDayOfWeek() == DayOfWeek.SATURDAY;
 
-			boolean isSunday =
-					date.getDayOfWeek() == DayOfWeek.SUNDAY;
+			boolean isSunday = date.getDayOfWeek() == DayOfWeek.SUNDAY;
 
-			boolean isHoliday =
-					holidayMap.containsKey(date);
+			boolean isHoliday = holidayMap.containsKey(date);
 
 			detail.setHoliday(isHoliday);
 
@@ -140,18 +130,15 @@ public class AttendanceInputServiceImpl
 		// DBに保存済みの明細があれば初期値へ上書きする
 		if (attendanceHeadId != null) {
 
-			List<AttendanceInputDetail> savedList =
-					attendanceMapper.findAttendanceDetails(
-							attendanceHeadId);
+			List<AttendanceInputDetail> savedList = attendanceMapper.findAttendanceDetails(
+					attendanceHeadId);
 
-			for (AttendanceInputDetail savedDetail
-					: savedList) {
+			for (AttendanceInputDetail savedDetail : savedList) {
 
 				int day = Integer.parseInt(
 						savedDetail.getAttendanceDate());
 
-				AttendanceInputDetail detail =
-						attendanceList.get(day - 1);
+				AttendanceInputDetail detail = attendanceList.get(day - 1);
 
 				detail.setKbn(savedDetail.getKbn());
 
@@ -206,15 +193,19 @@ public class AttendanceInputServiceImpl
 		String yyyymm = targetMonth.format(
 				DateTimeFormatter.ofPattern("yyyyMM"));
 
-		Long attendanceHeadId =
-				attendanceMapper.findAttendanceHeadId(userId, yyyymm);
+		Long attendanceHeadId = attendanceMapper.findAttendanceHeadId(userId, yyyymm);
+		
+		
+		// 新規登録か更新かを判定する
+		boolean isNewAttendance =
+		        attendanceHeadId == null;
+
 
 		// 申請中・承認済みの勤怠は変更不可
 		if (attendanceHeadId != null) {
 
-			String status =
-					attendanceMapper.findAttendanceHeadStatus(
-							attendanceHeadId);
+			String status = attendanceMapper.findAttendanceHeadStatus(
+					attendanceHeadId);
 
 			if ("1".equals(status)
 					|| "3".equals(status)) {
@@ -229,9 +220,8 @@ public class AttendanceInputServiceImpl
 
 			attendanceMapper.insertAttendanceHead(userId, yyyymm, "0");
 
-			attendanceHeadId =
-					attendanceMapper.findAttendanceHeadId(
-							userId, yyyymm);
+			attendanceHeadId = attendanceMapper.findAttendanceHeadId(
+					userId, yyyymm);
 		}
 
 		if (attendanceHeadId == null) {
@@ -239,21 +229,29 @@ public class AttendanceInputServiceImpl
 					"勤怠ヘッダーの登録に失敗しました。");
 		}
 
-		// 登録済みの勤怠明細を削除する
-		attendanceMapper.deleteAttendanceDetails(attendanceHeadId);
-
-		// 画面から受け取った勤怠明細を登録する
+		// 画面から受け取った勤怠明細を登録または更新する
 		if (attendanceList != null
 				&& !attendanceList.isEmpty()) {
 
-			attendanceMapper.insertAttendanceDetails(
-					attendanceHeadId, attendanceList);
+			if (isNewAttendance) {
+
+				attendanceMapper.insertAttendanceDetails(
+						attendanceHeadId, attendanceList);
+
+			} else {
+
+				for (AttendanceInputDetail attendance : attendanceList) {
+
+					attendanceMapper.updateAttendanceDetail(
+							attendanceHeadId, attendance);
+				}
+			}
 		}
-		
+
 		// 勤怠ヘッダーの更新日時を更新する
 		attendanceMapper.updateAttendanceHeadUpdatedAt(
-		        attendanceHeadId);
-		
+				attendanceHeadId);
+
 	}
 
 	/**
@@ -278,8 +276,7 @@ public class AttendanceInputServiceImpl
 		String yyyymm = targetMonth.format(
 				DateTimeFormatter.ofPattern("yyyyMM"));
 
-		Long attendanceHeadId =
-				attendanceMapper.findAttendanceHeadId(userId, yyyymm);
+		Long attendanceHeadId = attendanceMapper.findAttendanceHeadId(userId, yyyymm);
 
 		if (attendanceHeadId == null) {
 			throw new IllegalStateException(
@@ -309,8 +306,7 @@ public class AttendanceInputServiceImpl
 		String yyyymm = targetMonth.format(
 				DateTimeFormatter.ofPattern("yyyyMM"));
 
-		Long attendanceHeadId =
-				attendanceMapper.findAttendanceHeadId(userId, yyyymm);
+		Long attendanceHeadId = attendanceMapper.findAttendanceHeadId(userId, yyyymm);
 
 		// 未保存の場合はステータスなし
 		if (attendanceHeadId == null) {

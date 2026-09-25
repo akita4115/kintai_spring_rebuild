@@ -31,9 +31,10 @@ public interface AttendanceMapper {
 			@Param("yyyymm") String yyyymm,
 			@Param("status") String status);
 
-	//対象ヘッダーに紐づく勤怠明細を削除する
-	public void deleteAttendanceDetails(
-			@Param("attendanceHeadId") Long attendanceHeadId);
+	//勤怠明細を更新する
+	public void updateAttendanceDetail(
+	        @Param("attendanceHeadId") Long attendanceHeadId,
+	        @Param("attendance") AttendanceInputDetail attendance);
 
 	//勤怠明細を登録する
 	public void insertAttendanceDetails(

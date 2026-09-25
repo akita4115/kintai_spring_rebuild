@@ -120,15 +120,24 @@
 
 	</insert>
 
-	<!-- 既存の勤怠明細を削除 -->
-	<delete id="deleteAttendanceDetails">
+	<!-- 1日分の勤怠明細を更新 -->
+	<update id="updateAttendanceDetail">
 
-		DELETE FROM
-		attendance_details
-		WHERE
-		attendance_head_id = #{attendanceHeadId}
+		UPDATE attendance_details
+		SET
+		kbn = #{attendance.kbn},
+		start_time = NULLIF(#{attendance.startTime}, ''),
+		end_time = NULLIF(#{attendance.endTime}, ''),
+		rest_time = NULLIF(#{attendance.breakTime}, ''),
+		night_rest_time = NULLIF(#{attendance.nightBreakTime}, ''),
+		work_time = NULLIF(#{attendance.workTime}, ''),
+		over_time = NULLIF(#{attendance.overTime}, ''),
+		remarks = NULLIF(#{attendance.remarks}, ''),
+		updated_at = CURRENT_TIMESTAMP
+		WHERE attendance_head_id = #{attendanceHeadId}
+		AND day = SUBSTRING(#{attendance.attendanceDate}, 9, 2)
 
-	</delete>
+	</update>
 
 	<!-- 1か月分の勤怠明細を一括登録 -->
 	<insert id="insertAttendanceDetails"> INSERT INTO attendance_details (
@@ -149,7 +158,7 @@
 		NULLIF(#{attendance.nightBreakTime}, ''),
 			NULLIF(#{attendance.workTime}, ''),
 			NULLIF(#{attendance.overTime}, ''),
-			#{attendance.remarks},
+			NULLIF(#{attendance.remarks}, ''),
 			CURRENT_TIMESTAMP,
 			CURRENT_TIMESTAMP
 			)
